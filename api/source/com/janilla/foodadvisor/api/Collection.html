@@ -1,0 +1,61 @@
+<div class="collection">
+	<h2>${name}</h2>
+	<!--${list}-->
+	<!--${form}-->
+</div>
+
+<template id="Collection-empty">
+	<div class="collection"></div>
+</template>
+
+<template id="Collection-List">
+	<div class="list">
+		<button class="create">Create</button>
+		<table>
+			<thead>
+				<tr>
+					<!--${headers}-->
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<!--${rows}-->
+			</tbody>
+		</table>
+	</div>
+</template>
+
+<template id="Collection-Header">
+	<th>${}</th>
+</template>
+
+<template id="Collection-Row">
+	<tr>
+		<!--${cells}-->
+		<td>
+			<button class="edit" name="id" value="${id}">Edit</button>
+		</td>
+	</tr>
+</template>
+
+<template id="Collection-Cell">
+	<td>${}</td>
+</template>
+
+<template id="Collection-Form">
+	<form class="form">
+		<!--${fields}-->
+		<button class="save">Save</button>
+	</form>
+</template>
+
+<template id="Collection-Field">
+	<div class="field">
+		<label for="${name}">${name}</label>
+		<!--${control}-->
+	</div>
+</template>
+
+<template id="Collection-Text">
+	<input id="${name}" name="${name}" value="${value}" />
+</template>

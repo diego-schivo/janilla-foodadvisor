@@ -1,0 +1,34 @@
+<div class="restaurant-details">
+	<div>
+		<div>
+			<img src="${image}" alt="" />
+		</div>
+		<div>
+			<h2 class="category">${category}</h2>
+			<h1 class="name">${name}</h1>
+			<p class="description">${description}</p>
+		</div>
+	</div>
+</div>
+
+<template id="Restaurant-List">
+	<div class="restaurant-list">
+		<div>
+			<!--${}-->
+		</div>
+	</div>
+</template>
+
+<template id="Restaurant-Item">
+	<a href="/restaurants/${slug}" class="card">
+		<img src="${image}" alt="" />
+		<div>
+			<p class="place">${place}</p>
+			<p class="name">${name}</p>
+			<p class="description">${description}</p>
+			<div class="category-div">
+				<div class="category">#${category}</div>
+			</div>
+		</div>
+	</a>
+</template>

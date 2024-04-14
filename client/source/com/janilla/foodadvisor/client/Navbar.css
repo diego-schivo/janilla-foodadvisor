@@ -1,0 +1,30 @@
+.navbar {
+	border-bottom: 2px solid rgb(229, 231, 235);
+
+	> div {
+		margin: 0 auto;
+		max-width: 1536px;
+		padding: 1.25rem;
+	}
+
+	.logo {
+		align-items: center;
+		display: flex;
+
+		svg {
+			background: rgb(226, 125, 96);
+			border-radius: 9999px;
+			color: rgb(255, 255, 255);
+			height: 2.5rem;
+			padding: .5rem;
+			width: 2.5rem;
+		}
+		
+		span {
+			font-size: 1.875rem;
+			font-weight: 500;
+			line-height: 2.25rem;
+			margin: 0 0 0 .75rem;
+		}
+	}
+}

@@ -1,0 +1,76 @@
+body > div {
+	margin: 0 auto;
+	max-width: 1536px;
+}
+
+.restaurant-details {
+	margin-top: 10rem;
+	
+	> div {
+		display: flex;
+
+		> :first-child {
+			flex: 0 0 50%;
+			padding: .5rem;
+		}
+
+		> :last-child {
+			padding: 1.5rem 1rem 1.5rem 2.5rem;
+		}
+	}
+}
+
+.restaurant-list {
+	> div {
+		display: grid;
+		gap: 4rem;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		margin: 6rem 0 0;
+		padding: 0 1rem;
+	}
+	
+	.card {
+		border-radius: .5rem;
+		box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+			rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+			rgba(0, 0, 0, 0.1) 0px 10px 15px -3px,
+			rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;
+		display: block;
+		overflow: hidden;
+
+		> div {
+			padding: 1rem;
+		}
+	}
+	
+	img {
+		max-height: 12rem;
+		object-fit: cover;
+		width: 100%;
+	}
+	
+	.place {
+		color: rgb(65, 179, 163);
+	}
+	
+	.name {
+		font-size: 1.25rem;
+		margin: 0 0 .5rem;
+	}
+	
+	.description {
+		color: rgb(156, 163, 175);
+	}
+	
+	.category-div {
+		display: flex;
+		margin: 1rem 0 0;
+	}
+	
+	.category {
+		background: rgb(219, 234, 254);
+		border-radius: 1rem;
+		font-size: .75rem;
+		padding: .375rem 1rem;
+	}
+}

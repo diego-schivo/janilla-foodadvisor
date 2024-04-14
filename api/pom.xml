@@ -1,0 +1,28 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>janilla-foodadvisor-api</artifactId>
+	<dependencies>
+		<dependency>
+			<groupId>com.janilla</groupId>
+			<artifactId>janilla-foodadvisor-core</artifactId>
+		</dependency>
+	</dependencies>
+	<parent>
+		<groupId>com.janilla</groupId>
+		<artifactId>janilla-foodadvisor</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>com.janilla.foodadvisor.api.FoodAdvisorApiApp</mainClass>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>

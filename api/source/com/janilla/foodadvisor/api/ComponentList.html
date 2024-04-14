@@ -1,0 +1,28 @@
+<div>
+	<!--${list}-->
+	<select class="type">
+		<option value=""></option>
+		<!--${options}-->
+	</select>
+</div>
+
+<template id="ComponentList-Item">
+	<div class="item">
+		<!--${fields}-->
+	</div>
+</template>
+
+<template id="ComponentList-Option">
+	<option value="${}">${}</option>
+</template>
+
+<template id="ComponentList-Field">
+	<div class="field">
+		<label for="${name}">${name}</label>
+		<!--${control}-->
+	</div>
+</template>
+
+<template id="ComponentList-Text">
+	<input id="${name}" name="${name}" value="${value}" />
+</template>

@@ -1,0 +1,22 @@
+*, ::before, ::after {
+	box-sizing: border-box;
+}
+
+html {
+	font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+		"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	line-height: 1.5;
+}
+
+body, h1, h2, h3, p {
+	margin: 0;
+}
+
+a {
+	color: inherit;
+	text-decoration: inherit;
+}
+
+img {
+	max-width: 100%;
+}
