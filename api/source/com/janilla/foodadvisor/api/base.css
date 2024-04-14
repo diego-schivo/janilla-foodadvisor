@@ -6,3 +6,7 @@ body {
 th {
 	text-align: left;
 }
+
+ol {
+	list-style: none;
+}

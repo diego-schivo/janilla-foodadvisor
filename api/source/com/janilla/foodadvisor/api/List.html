@@ -1,0 +1,23 @@
+<div class="list">
+	<ol>
+		<!--${items}-->
+	</ol>
+	<button class="add">Add</button>
+</div>
+
+<template id="List-Item">
+	<li class="item">
+		<!--${field}-->
+	</li>
+</template>
+
+<template id="List-Field">
+	<div class="field">
+		<label for="${name}">${label}</label>
+		<!--${control}-->
+	</div>
+</template>
+
+<template id="List-Text">
+	<input id="${name}" name="${name}" value="${value}" />
+</template>

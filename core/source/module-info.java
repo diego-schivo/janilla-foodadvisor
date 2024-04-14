@@ -25,5 +25,7 @@ module com.janilla.foodadvisor.core {
 
 	exports com.janilla.foodadvisor.core;
 
+	opens com.janilla.foodadvisor.core;
+
 	requires transitive com.janilla;
 }

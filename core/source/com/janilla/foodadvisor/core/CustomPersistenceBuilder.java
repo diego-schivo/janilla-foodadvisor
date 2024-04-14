@@ -51,6 +51,13 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 		}
 		var e = Files.exists(file);
 		var p = super.build();
+		p.setTypeResolver(x -> {
+			try {
+				return Class.forName("com.janilla.foodadvisor.core." + x);
+			} catch (ClassNotFoundException f) {
+				throw new RuntimeException(f);
+			}
+		});
 		if (!e) {
 		}
 		return p;

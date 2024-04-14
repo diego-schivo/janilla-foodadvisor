@@ -23,42 +23,26 @@
  */
 package com.janilla.foodadvisor.core;
 
-import java.util.List;
+import java.net.URI;
 
-import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
 import com.janilla.reflect.Order;
 import com.janilla.web.Render;
 
-@Render(template = "Hero.html")
-public class Hero implements Component, Renderer {
+@Render(template = "Link.html")
+public class Link implements Component {
 
 	@Order(1)
-	private List<String> images;
+	private URI uri;
 
 	@Order(2)
-	private String title;
-
-	@Order(3)
 	private String text;
 
-	@Order(4)
-	private List<Link> buttons;
-
-	public List<String> getImages() {
-		return images;
+	public URI getUri() {
+		return uri;
 	}
 
-	public void setImages(List<String> images) {
-		this.images = images;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
+	public void setUri(URI uri) {
+		this.uri = uri;
 	}
 
 	public String getText() {
@@ -67,20 +51,5 @@ public class Hero implements Component, Renderer {
 
 	public void setText(String text) {
 		this.text = text;
-	}
-
-	public List<Link> getButtons() {
-		return buttons;
-	}
-
-	public void setButtons(List<Link> buttons) {
-		this.buttons = buttons;
-	}
-
-	@Override
-	public boolean evaluate(RenderEngine engine) {
-		record A(String[] images, int index) {
-		}
-		return engine.match(A.class, (i, o) -> o.setTemplate("Hero-Image.html"));
 	}
 }

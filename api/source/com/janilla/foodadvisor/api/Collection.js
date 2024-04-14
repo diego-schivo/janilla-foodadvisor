@@ -40,7 +40,7 @@ class Collection {
 	id;
 
 	content;
-	
+
 	componentList;
 
 	render = async engine => {
@@ -60,26 +60,41 @@ class Collection {
 				this.rows = await s.json();
 				o.template = 'Collection-List';
 			}
-		}) || await engine.match(['headers', 'number'], async (_, o) => o.template = 'Collection-Header')
-			|| await engine.match(['rows', 'number'], async (_, o) => o.template = 'Collection-Row')
-			|| await engine.match([undefined, 'cells'], async (i, o) => o.value = this.headers.map(x => i[0][x]))
-			|| await engine.match(['cells', 'number'], async (_, o) => o.template = 'Collection-Cell')
-			|| await engine.match(['form'], async (_, o) => {
-				if (this.content)
-					o.template = 'Collection-Form';
-			}) || await engine.match(['fields'], async (_, o) => o.value = this.properties.filter(x => x !== 'id').map(x => ({ name: x, value: this.content[x] })))
-			|| await engine.match(['fields', 'number'], async (_, o) => o.template = 'Collection-Field')
-			|| await engine.match([undefined, 'control'], async (i, o) => {
-				if (i[0].name === 'components') {
-					const l = new ComponentList();
-					l.list = i[0].value;
-					l.selector = () => {
+		}) || await engine.match(['headers', 'number'], async (_, o) => {
+			o.template = 'Collection-Header';
+		}) || await engine.match(['rows', 'number'], async (_, o) => {
+			o.template = 'Collection-Row';
+		}) || await engine.match([undefined, 'cells'], async (i, o) => {
+			o.value = this.headers.map(x => i[0][x]);
+		}) || await engine.match(['cells', 'number'], async (_, o) => {
+			o.template = 'Collection-Cell'
+		}) || await engine.match(['form'], async (_, o) => {
+			if (this.content)
+				o.template = 'Collection-Form';
+		}) || await engine.match(['fields'], async (_, o) => {
+			o.value = this.properties.filter(x => x !== 'id').map(x => ({
+				name: x,
+				label: x,
+				value: this.content[x]
+			}));
+		}) || await engine.match(['fields', 'number'], async (_, o) => {
+			o.template = 'Collection-Field';
+		}) || await engine.match([undefined, 'control'], async (i, o) => {
+			switch (i[0].name) {
+				case 'components':
+					const c = new ComponentList();
+					c.name = i[0].name;
+					c.items = i[0].value;
+					c.selector = () => {
 						return this.selector().querySelector('label[for="components"]').nextElementSibling;
 					};
-					o.value = this.componentList = l;
-				} else
+					o.value = this.componentList = c;
+					break;
+				default:
 					o.template = 'Collection-Text';
-			});
+					break;
+			}
+		});
 	}
 
 	listen = () => {

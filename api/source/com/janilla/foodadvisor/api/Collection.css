@@ -5,11 +5,23 @@
 		align-items: start;
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: .5rem;
 	}
 
 	.field {
 		display: flex;
 		flex-direction: column;
+	}
+
+	ol,
+	li {
+		display: flex;
+		flex-direction: column;
+		gap: .5rem;
+	}
+	
+	ol {
+		margin: 0;
+		padding: 0 0 0 2rem;
 	}
 }

@@ -21,9 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-class ComponentList {
+import List from './List.js';
 
-	list;
+class ComponentList {
+	
+	name;
+
+	items;
 
 	selector;
 
@@ -31,30 +35,57 @@ class ComponentList {
 
 	index;
 
-	item;
-
 	properties;
 
 	fields;
+	
+	fieldIndex;
+	
+	controls;
 
 	render = async engine => {
 		return await engine.match([this], async (_, o) => {
 			this.engine = engine.clone();
+			['index', 'properties', 'fields', 'fieldIndex', 'list'].forEach(x => delete this[x]);
+			this.controls = [];
 			o.template = 'ComponentList';
-		}) || (this.list && await engine.match([this.list, 'number'], async (_, o) => {
+		}) || (this.items && await engine.match([this.items, 'number'], async (_, o) => {
 			this.index = o.key;
-			this.item = o.value;
-			const s = await fetch(`/api/types/${this.item['$type']}/properties`);
+			const s = await fetch(`/api/types/${this.items[this.index]['$type']}/properties`);
 			this.properties = await s.json();
 			o.template = 'ComponentList-Item';
-		})) || (this.item && await engine.match([this.item, 'fields'], async (_, o) => {
-			o.value = this.fields = ['$type', ...this.properties].map(x => ({ name: x, value: this.item[x] }));
+		})) || (this.index >= 0 && await engine.match([this.items[this.index], 'fields'], async (_, o) => {
+			o.value = this.fields = ['$type', ...this.properties].map(x => ({
+				name: `${this.name}[${this.index}].${x}`,
+				label: x,
+				value: this.items[this.index][x]
+			}));
 		})) || (this.fields && await engine.match([this.fields, 'number'], async (_, o) => {
+			this.fieldIndex = o.key;
 			o.template = 'ComponentList-Field';
-		})) || await engine.match(['name'], async (_, o) => {
-			o.value = `components[${this.index}].${o.value}`;
-		}) || await engine.match(['control'], async (_, o) => {
-			o.template = 'Collection-Text';
+		})) || await engine.match(['control'], async (_, o) => {
+			const f = this.fields[this.fieldIndex];
+			let c;
+			switch (f.label) {
+				case 'images':
+					c = new List();
+					c.items = f.value;
+					c.selector = () => this.selector().querySelector(`label[for="${f.name}"]`).nextElementSibling;
+					this.controls.push(c);
+					o.value = c;
+					break;
+				case 'buttons':
+					c = new ComponentList();
+					c.name = f.name;
+					c.items = f.value;
+					c.selector = () => this.selector().querySelector(`label[for="${f.name}"]`).nextElementSibling;
+					this.controls.push(c);
+					o.value = c;
+					break;
+				default:
+					o.template = 'ComponentList-Text';
+					break;
+			}
 		}) || await engine.match(['options'], async (_, o) => {
 			const s = await fetch('/api/components');
 			o.value = await s.json();
@@ -64,7 +95,8 @@ class ComponentList {
 	}
 
 	listen = () => {
-		this.selector().querySelector('.type').addEventListener('change', this.handleTypeChange);
+		this.selector().querySelector(':scope > .add').addEventListener('click', this.handleAddClick);
+		this.controls.forEach(x => x.listen());
 	}
 
 	refresh = async () => {
@@ -72,11 +104,19 @@ class ComponentList {
 		this.listen();
 	}
 
+	handleAddClick = async event => {
+		event.preventDefault();
+		const d = this.selector().querySelector(':scope > .add-dialog');
+		d.showModal();
+		d.querySelector('.type').addEventListener('change', this.handleTypeChange);
+	}
+
 	handleTypeChange = async event => {
-		const t = event.currentTarget.value;
-		if (!this.list)
-			this.list = [];
-		this.list.push({ '$type': t });
+		const s = event.currentTarget;
+		s.closest('dialog').close();
+		if (!this.items)
+			this.items = [];
+		this.items.push({ '$type': s.value });
 		this.refresh();
 	}
 }

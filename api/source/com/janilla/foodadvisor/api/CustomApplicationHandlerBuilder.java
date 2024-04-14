@@ -30,8 +30,16 @@ public class CustomApplicationHandlerBuilder extends ApplicationHandlerBuilder {
 
 	@Override
 	protected MethodHandlerFactory buildMethodHandlerFactory() {
+		var r = new CustomMethodArgumentsResolver();
+		r.setTypeResolver(x -> {
+			try {
+				return Class.forName("com.janilla.foodadvisor.core." + x);
+			} catch (ClassNotFoundException f) {
+				throw new RuntimeException(f);
+			}
+		});
 		var f = super.buildMethodHandlerFactory();
-		f.setArgumentsResolver(new CustomMethodArgumentsResolver());
+		f.setArgumentsResolver(r);
 		return f;
 	}
 }
