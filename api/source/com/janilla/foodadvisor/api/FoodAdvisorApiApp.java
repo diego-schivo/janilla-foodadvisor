@@ -28,8 +28,8 @@ import java.io.UncheckedIOException;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-import com.janilla.foodadvisor.core.CustomPersistenceBuilder;
 import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
 import com.janilla.persistence.Persistence;
@@ -46,8 +46,9 @@ public class FoodAdvisorApiApp {
 			}
 			a.setConfiguration(c);
 		}
+		a.getPersistence();
 
-		var s = new HttpServer();
+		var s = a.new Server();
 		s.setPort(Integer.parseInt(a.getConfiguration().getProperty("foodadvisor.api.server.port")));
 		s.setHandler(a.getHandler());
 		s.run();
@@ -62,7 +63,7 @@ public class FoodAdvisorApiApp {
 	});
 
 	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
-		var b = new CustomApplicationHandlerBuilder();
+		var b = new CustomHandlerBuilder();
 		b.setApplication(this);
 		return b.build();
 	});
@@ -85,5 +86,20 @@ public class FoodAdvisorApiApp {
 
 	public IO.Consumer<HttpExchange> getHandler() {
 		return handler.get();
+	}
+
+	class Server extends HttpServer {
+
+		@Override
+		protected HttpExchange newExchange(HttpRequest request) {
+			return new Exchange();
+		}
+	}
+
+	public class Exchange extends CustomExchange {
+		{
+			configuration = getConfiguration();
+			persistence = getPersistence();
+		}
 	}
 }

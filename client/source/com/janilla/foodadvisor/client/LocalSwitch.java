@@ -23,27 +23,11 @@
  */
 package com.janilla.foodadvisor.client;
 
+import java.util.List;
 import java.util.Locale;
 
-import com.janilla.foodadvisor.api.Global;
-import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
 import com.janilla.web.Render;
 
-@Render(template = "Layout.html")
-public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements Renderer {
-
-	public Navbar navbar() {
-		return new Navbar(global != null ? global.getNavigation() : null);
-	}
-
-	@Override
-	public boolean evaluate(RenderEngine engine) {
-		record A(Layout layout, Object content) {
-		}
-		return engine.match(A.class, (i, o) -> {
-			o.setValue(entry.getValue());
-			o.setType(entry.getType());
-		});
-	}
+@Render(template = "LocalSwitch.html")
+public record LocalSwitch(List<@Render(template = "LocalSwitch-Locale.html") Locale> locales) {
 }

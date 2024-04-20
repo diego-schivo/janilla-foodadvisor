@@ -2,6 +2,7 @@
 	border-bottom: 2px solid rgb(229, 231, 235);
 
 	> div {
+		display: flex;
 		margin: 0 auto;
 		max-width: 1536px;
 		padding: 1.25rem;
@@ -26,5 +27,33 @@
 			line-height: 2.25rem;
 			margin: 0 0 0 .75rem;
 		}
+	}
+	
+	nav {
+		color: rgb(75, 85, 99);
+		display: flex;
+		font-size: 1.25rem;
+		gap: 2.5rem;
+		line-height: 1.75rem;
+		margin: 0 auto;
+		padding: 1.25rem;
+	}
+	
+	.cta-parent {
+		align-items: center;
+		display: flex;
+		gap: 2.25rem;
+	}
+
+	.cta {
+		background: rgb(226, 125, 96);
+		border-radius: 9999px;
+		box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+			rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+			rgba(0, 0, 0, 0.1) 0px 4px 6px -1px,
+			rgba(0, 0, 0, 0.1) 0px 2px 4px -2px;
+		color: rgb(255, 255, 255);
+		font-weight: 600;
+		padding: 1rem 1.5rem;
 	}
 }

@@ -21,61 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-class List {
-
-	items;
+class Login {
 
 	selector;
 
-	engine;
-
-	index;
-
 	render = async engine => {
 		return await engine.match([this], async (_, o) => {
-			this.engine = engine.clone();
-			delete this.index;
-			o.template = 'List';
-		}) || (this.items && await engine.match([this.items, 'number'], async (_, o) => {
-			this.index = o.key;
-			o.template = 'List-Item';
-		})) || await engine.match(['field'], async (_, o) => {
-			o.value = {
-				name: `components[0].images[${this.index}]`,
-				label: this.index,
-				value: this.items[this.index]
-			};
-			o.template = 'List-Field';
-		}) || await engine.match(['control'], async (_, o) => {
-			o.template = 'List-Text';
+			o.template = 'Login';
 		});
 	}
 
 	listen = () => {
-		this.selector().addEventListener('change', this.handleChange);
-		this.selector().querySelector(':scope > .add').addEventListener('click', this.handleAddClick);
+		this.selector().querySelector('form').addEventListener('submit', this.handleFormSubmit);
 	}
-
-	refresh = async () => {
-		this.selector().outerHTML = await this.engine.render({ value: this });
-		this.listen();
-	}
-
-	handleChange = async event => {
-		const i = event.target.closest('input');
-		if (!i)
-			return;
-		const g = i.name.match(/\[(\d+)\]$/)[1];
-		const j = parseInt(g, 10);
-		this.items[j] = i.value;
-	}
-
-	handleAddClick = async () => {
-		if (!this.items)
-			this.items = [];
-		this.items.push('');
-		this.refresh();
+	
+	handleFormSubmit = async event => {
+		event.preventDefault();
+		const d = new FormData(event.currentTarget);
+		const s = await fetch('/admin/login', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(Object.fromEntries(d))
+		});
+		const j = await s.json();
+		this.selector().dispatchEvent(new CustomEvent('login', {
+			bubbles: true,
+			detail: { token: j }
+		}));
 	}
 }
 
-export default List;
+export default Login;

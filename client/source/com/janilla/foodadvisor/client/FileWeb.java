@@ -24,48 +24,52 @@
 package com.janilla.foodadvisor.client;
 
 import java.io.IOException;
+import java.nio.channels.WritableByteChannel;
+import java.util.List;
 
-import com.janilla.foodadvisor.api.Global;
-import com.janilla.frontend.RenderEngine;
-import com.janilla.http.HttpExchange;
+import com.janilla.foodadvisor.api.File;
+import com.janilla.foodadvisor.api.Restaurant;
+import com.janilla.http.HttpResponse;
+import com.janilla.http.HttpResponse.Status;
+import com.janilla.io.IO;
 import com.janilla.persistence.Persistence;
-import com.janilla.web.TemplateHandlerFactory;
+import com.janilla.web.Handle;
+import com.janilla.web.NotFoundException;
+import com.janilla.web.Render;
 
-public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
+public class FileWeb {
 
-	protected static ThreadLocal<Layout> layout = new ThreadLocal<>();
-
-	protected Persistence persistence;
+	Persistence persistence;
 
 	public void setPersistence(Persistence persistence) {
 		this.persistence = persistence;
 	}
 
-	@Override
-	protected void render(RenderEngine.Entry input, HttpExchange exchange) throws IOException {
-		var l = layout.get();
-		var r = false;
-		if (l == null) {
-			var ii = persistence.getCrud(Global.class).list(0, 1).ids();
-			var g = ii.length > 0 ? persistence.getCrud(Global.class).read(ii[0]) : null;
-			l = new Layout(((FoodAdvisorClientApp.Exchange) exchange).getLocale(), g, input);
-			if (l != null) {
-				input = RenderEngine.Entry.of(null, l, null);
-				r = true;
-			}
-		}
-		try {
-			super.render(input, exchange);
-		} finally {
-			if (r)
-				layout.remove();
-		}
+	@Handle(method = "GET", path = "/restaurants")
+	public @Render(template = "Restaurant-List.html") List<com.janilla.foodadvisor.api.Restaurant> getList()
+			throws IOException {
+		var ii = persistence.getCrud(Restaurant.class).list();
+		var rr = persistence.getCrud(Restaurant.class).read(ii).toList();
+		return rr;
 	}
 
-	@Override
-	protected RenderEngine newRenderEngine(HttpExchange exchange) {
-		var e = new CustomRenderEngine();
-		e.setLocale(((FoodAdvisorClientApp.Exchange) exchange).getLocale());
-		return e;
+	@Handle(method = "GET", path = "/files/(\\d+)")
+	public void getFile(long id, HttpResponse response) throws IOException {
+		var f = persistence.getCrud(File.class).read(id);
+		if (f == null)
+			throw new NotFoundException();
+		response.setStatus(new Status(200, "OK"));
+		var n = f.getName();
+		var e = n.substring(n.lastIndexOf('.') + 1);
+		var hh = response.getHeaders();
+		switch (e) {
+		case "png":
+			hh.set("Content-Type", "image/png");
+			break;
+		}
+		var bb = f.getBytes();
+		hh.set("Content-Length", String.valueOf(bb.length));
+		var b = (WritableByteChannel) response.getBody();
+		IO.write(bb, b);
 	}
 }

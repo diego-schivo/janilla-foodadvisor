@@ -23,27 +23,34 @@
  */
 package com.janilla.foodadvisor.client;
 
-import java.util.Locale;
+import java.io.IOException;
+import java.util.List;
 
-import com.janilla.foodadvisor.api.Global;
-import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
+import com.janilla.foodadvisor.api.Restaurant;
+import com.janilla.persistence.Persistence;
+import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
-@Render(template = "Layout.html")
-public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements Renderer {
+public class RestaurantWeb {
 
-	public Navbar navbar() {
-		return new Navbar(global != null ? global.getNavigation() : null);
+	Persistence persistence;
+
+	public void setPersistence(Persistence persistence) {
+		this.persistence = persistence;
 	}
 
-	@Override
-	public boolean evaluate(RenderEngine engine) {
-		record A(Layout layout, Object content) {
-		}
-		return engine.match(A.class, (i, o) -> {
-			o.setValue(entry.getValue());
-			o.setType(entry.getType());
-		});
+	@Handle(method = "GET", path = "/restaurants")
+	public @Render(template = "Restaurant-List.html") List<com.janilla.foodadvisor.api.Restaurant> getList()
+			throws IOException {
+		var ii = persistence.getCrud(Restaurant.class).list();
+		var rr = persistence.getCrud(Restaurant.class).read(ii).toList();
+		return rr;
+	}
+
+	@Handle(method = "GET", path = "/restaurants/([a-z-]+)")
+	public @Render(template = "Restaurant.html") Restaurant getDetails(String slug) throws IOException {
+		var ii = persistence.getCrud(Restaurant.class).filter("slug", slug);
+		var r = persistence.getCrud(Restaurant.class).read(ii[0]);
+		return r;
 	}
 }

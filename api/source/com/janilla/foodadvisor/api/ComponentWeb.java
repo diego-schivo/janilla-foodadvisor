@@ -25,7 +25,6 @@ package com.janilla.foodadvisor.api;
 
 import java.util.List;
 
-import com.janilla.foodadvisor.core.Component;
 import com.janilla.web.Handle;
 
 public class ComponentWeb {

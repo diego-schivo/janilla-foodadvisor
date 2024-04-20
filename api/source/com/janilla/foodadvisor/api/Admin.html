@@ -10,21 +10,24 @@
 <body>
 </body>
 
-<template id="Admin-Body">
+<template id="Admin-authenticated">
 	<div class="admin">
-		<div>
-			<ul>
-				<!--${collections}-->
-			</ul>
-		</div>
+		<select class="type">
+			<option></option>
+			<!--${types}-->
+		</select>
 		<!--${collection}-->
 	</div>
 </template>
 
-<template id="Admin-Collection">
-	<li>
-		<a href="#">${}</a>
-	</li>
+<template id="Admin-unauthenticated">
+	<div class="admin">
+		<!--${login}-->
+	</div>
+</template>
+
+<template id="Admin-Option">
+	<option>${}</option>
 </template>
 
 </html>

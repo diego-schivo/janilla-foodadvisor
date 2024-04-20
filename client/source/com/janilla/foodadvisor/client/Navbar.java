@@ -23,12 +23,29 @@
  */
 package com.janilla.foodadvisor.client;
 
+import java.util.List;
+import java.util.Locale;
+
+import com.janilla.foodadvisor.api.Link;
+import com.janilla.foodadvisor.api.Navigation;
 import com.janilla.web.Render;
 
 @Render(template = "Navbar.html")
-public record Navbar() {
+public record Navbar(Navigation navigation) {
 
-	public @Render(template = "Navbar-Logo.html") Object logo() {
-		return "logo";
+	public @Render(template = "Navbar-Logo.html") Link logo() {
+		return navigation != null ? navigation.getLeftButton() : null;
+	}
+
+	public @Render(template = "Navbar-Nav.html") List<Link> nav() {
+		return navigation != null ? navigation.getLinks() : null;
+	}
+
+	public @Render(template = "Navbar-CTA.html") Link cta() {
+		return navigation != null ? navigation.getRightButton() : null;
+	}
+
+	public LocalSwitch localSwitch() {
+		return new LocalSwitch(List.of(Locale.ENGLISH, Locale.FRANCE));
 	}
 }

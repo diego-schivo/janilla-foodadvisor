@@ -24,10 +24,13 @@
 package com.janilla.foodadvisor.client;
 
 import java.io.IOException;
+import java.util.Locale;
 
-import com.janilla.foodadvisor.core.Page;
+import com.janilla.foodadvisor.api.Page;
 import com.janilla.persistence.Persistence;
+import com.janilla.reflect.Parameter;
 import com.janilla.web.Handle;
+import com.janilla.web.NotFoundException;
 import com.janilla.web.Render;
 
 public class PageWeb {
@@ -39,8 +42,13 @@ public class PageWeb {
 	}
 
 	@Handle(method = "GET", path = "([/a-z-]*/)([a-z-]*)")
-	public @Render(template = "Page.html") Page getPage(String prefix, String slug) throws IOException {
+	public @Render(template = "Page.html") Page getPage(String prefix, String slug,
+			@Parameter(name = "lang") Locale locale, FoodAdvisorClientApp.Exchange exchange) throws IOException {
+		if (locale != null)
+			exchange.setLocale(locale);
 		var ii = persistence.getCrud(Page.class).filter("slug", slug);
+		if (ii.length == 0)
+			throw new NotFoundException();
 		var p = persistence.getCrud(Page.class).read(ii[0]);
 		return p;
 	}

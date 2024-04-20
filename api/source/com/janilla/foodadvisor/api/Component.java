@@ -21,29 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.client;
+package com.janilla.foodadvisor.api;
 
-import java.util.Locale;
-
-import com.janilla.foodadvisor.api.Global;
-import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
-import com.janilla.web.Render;
-
-@Render(template = "Layout.html")
-public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements Renderer {
-
-	public Navbar navbar() {
-		return new Navbar(global != null ? global.getNavigation() : null);
-	}
-
-	@Override
-	public boolean evaluate(RenderEngine engine) {
-		record A(Layout layout, Object content) {
-		}
-		return engine.match(A.class, (i, o) -> {
-			o.setValue(entry.getValue());
-			o.setType(entry.getType());
-		});
-	}
+public interface Component {
 }

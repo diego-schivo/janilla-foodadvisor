@@ -24,15 +24,13 @@
 package com.janilla.foodadvisor.api;
 
 import java.lang.reflect.Type;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import com.janilla.http.HttpExchange;
 import com.janilla.util.EntryList;
-import com.janilla.util.EntryTree;
 import com.janilla.web.MethodArgumentsResolver;
 
-public class CustomMethodArgumentsResolver extends MethodArgumentsResolver {
+public class CustomArgumentsResolver extends MethodArgumentsResolver {
 
 	@Override
 	protected Object resolveArgument(Type type, HttpExchange exchange, Supplier<String[]> values,
@@ -40,8 +38,8 @@ public class CustomMethodArgumentsResolver extends MethodArgumentsResolver {
 		var q = exchange.getRequest();
 		if (type == Object.class && q.getURI().getPath().startsWith("/api/collections/"))
 			try {
-				type = Class.forName("com.janilla.foodadvisor.core."
-						+ q.getURI().getPath().substring("/api/collections/".length()).split("/")[0]);
+				type = Class.forName("com.janilla.foodadvisor.api."
+						+ q.getURI().getPath().substring("/api/collections/".length()).split("/")[0].replace('.', '$'));
 			} catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
 			}

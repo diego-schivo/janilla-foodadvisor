@@ -21,35 +21,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.core;
+package com.janilla.foodadvisor.api;
 
-import java.net.URI;
-
+import com.janilla.persistence.Index;
+import com.janilla.persistence.Store;
 import com.janilla.reflect.Order;
-import com.janilla.web.Render;
 
-@Render(template = "Link.html")
-public class Link implements Component {
+@Store
+public class User {
 
 	@Order(1)
-	private URI uri;
+	private long id;
 
+	@Index
 	@Order(2)
-	private String text;
+	private String email;
 
-	public URI getUri() {
-		return uri;
+	@Order(3)
+	private String hash;
+
+	@Order(4)
+	private String salt;
+
+	public long getId() {
+		return id;
 	}
 
-	public void setUri(URI uri) {
-		this.uri = uri;
+	public void setId(long id) {
+		this.id = id;
 	}
 
-	public String getText() {
-		return text;
+	public String getEmail() {
+		return email;
 	}
 
-	public void setText(String text) {
-		this.text = text;
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getHash() {
+		return hash;
+	}
+
+	public void setHash(String hash) {
+		this.hash = hash;
+	}
+
+	public String getSalt() {
+		return salt;
+	}
+
+	public void setSalt(String salt) {
+		this.salt = salt;
 	}
 }

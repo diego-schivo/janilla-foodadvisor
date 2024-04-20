@@ -21,11 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.core;
+class TextControl {
 
-public interface Component {
+	selector;
+	
+	binding;
+	
+	get value() {
+		return this.binding.getter();
+	}
+	
+	set value(x) {
+		this.binding.setter(x);
+	}
 
-//	default String componentType() {
-//		return getClass().getSimpleName();
-//	}
+	render = async engine => {
+		return await engine.match([this], async (_, o) => {
+			o.template = 'TextControl';
+		});
+	}
+
+	listen = () => {
+		this.selector().querySelector('input').addEventListener('change', this.handleInputChange);
+	}
+	
+	handleInputChange = event => {
+		const i = event.currentTarget;
+		this.value = i.value;
+	}
 }
+
+export default TextControl;

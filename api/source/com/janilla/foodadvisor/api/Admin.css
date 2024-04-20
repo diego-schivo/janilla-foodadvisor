@@ -1,8 +1,6 @@
 .admin {
+	align-items: start;
 	display: flex;
+	flex-direction: column;
 	gap: 1rem;
-	
-	> :first-child {
-		flex: 0 0 20rem;
-	}
 }

@@ -13,15 +13,12 @@
 		flex-direction: column;
 	}
 
+	/*
 	ol,
 	li {
 		display: flex;
 		flex-direction: column;
 		gap: .5rem;
 	}
-	
-	ol {
-		margin: 0;
-		padding: 0 0 0 2rem;
-	}
+	*/
 }

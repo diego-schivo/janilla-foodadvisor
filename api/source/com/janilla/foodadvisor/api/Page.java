@@ -21,29 +21,72 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.client;
+package com.janilla.foodadvisor.api;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-import com.janilla.foodadvisor.api.Global;
-import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
-import com.janilla.web.Render;
+import com.janilla.persistence.Index;
+import com.janilla.persistence.Store;
+import com.janilla.reflect.Order;
 
-@Render(template = "Layout.html")
-public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements Renderer {
+@Store
+public class Page {
 
-	public Navbar navbar() {
-		return new Navbar(global != null ? global.getNavigation() : null);
+	@Order(1)
+	private long id;
+
+	@Order(2)
+	private String name;
+
+	@Index
+	@Order(3)
+	private String slug;
+
+	@Order(4)
+	private Map<Locale, String> title;
+
+	@Order(5)
+	private List<Component> components;
+
+	public long getId() {
+		return id;
 	}
 
-	@Override
-	public boolean evaluate(RenderEngine engine) {
-		record A(Layout layout, Object content) {
-		}
-		return engine.match(A.class, (i, o) -> {
-			o.setValue(entry.getValue());
-			o.setType(entry.getType());
-		});
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getSlug() {
+		return slug;
+	}
+
+	public void setSlug(String slug) {
+		this.slug = slug;
+	}
+
+	public Map<Locale, String> getTitle() {
+		return title;
+	}
+
+	public void setTitle(Map<Locale, String> title) {
+		this.title = title;
+	}
+
+	public List<Component> getComponents() {
+		return components;
+	}
+
+	public void setComponents(List<Component> components) {
+		this.components = components;
 	}
 }

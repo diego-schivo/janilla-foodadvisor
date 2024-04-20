@@ -21,29 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.client;
+package com.janilla.foodadvisor.api;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-import com.janilla.foodadvisor.api.Global;
-import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
+import com.janilla.reflect.Order;
 import com.janilla.web.Render;
 
-@Render(template = "Layout.html")
-public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements Renderer {
+@Render(template = "Features.html")
+public class Features implements Component {
 
-	public Navbar navbar() {
-		return new Navbar(global != null ? global.getNavigation() : null);
+	@Order(1)
+	public Header header;
+
+	@Order(2)
+	public List<Card> cards;
+
+	public static class Header {
+
+		@Order(1)
+		public Map<Locale, String> label;
+
+		@Order(2)
+		public Map<Locale, String> title;
 	}
 
-	@Override
-	public boolean evaluate(RenderEngine engine) {
-		record A(Layout layout, Object content) {
-		}
-		return engine.match(A.class, (i, o) -> {
-			o.setValue(entry.getValue());
-			o.setType(entry.getType());
-		});
+	public static class Card {
+
+		@Order(1)
+		public Map<Locale, String> title;
+
+		@Order(2)
+		public Map<Locale, String> text;
+
+		@Order(3)
+		public Long image;
 	}
 }

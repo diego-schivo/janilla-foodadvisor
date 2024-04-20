@@ -27,5 +27,5 @@ module com.janilla.foodadvisor.api {
 
 	opens com.janilla.foodadvisor.api;
 
-	requires transitive com.janilla.foodadvisor.core;
+	requires transitive com.janilla;
 }

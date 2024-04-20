@@ -25,17 +25,11 @@
 				<artifactId>janilla-foodadvisor-client</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
-			<dependency>
-				<groupId>com.janilla</groupId>
-				<artifactId>janilla-foodadvisor-core</artifactId>
-				<version>0.0.1-SNAPSHOT</version>
-			</dependency>
 		</dependencies>
 	</dependencyManagement>
 	<modules>
 		<module>api</module>
 		<module>client</module>
-		<module>core</module>
 	</modules>
 	<properties>
 		<maven.compiler.source>21</maven.compiler.source>

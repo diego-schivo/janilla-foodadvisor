@@ -21,59 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.core;
+package com.janilla.foodadvisor.api;
 
 import java.util.List;
 
-import com.janilla.persistence.Index;
-import com.janilla.persistence.Store;
 import com.janilla.reflect.Order;
 
-@Store
-public class Page {
+public class Navigation implements Component {
 
 	@Order(1)
-	private long id;
+	private List<Link> links;
 
 	@Order(2)
-	private String name;
+	private Link leftButton;
 
-	@Index
 	@Order(3)
-	private String slug;
+	private Link rightButton;
 
-	@Order(4)
-	private List<Component> components;
-
-	public long getId() {
-		return id;
+	public List<Link> getLinks() {
+		return links;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public void setLinks(List<Link> links) {
+		this.links = links;
 	}
 
-	public String getName() {
-		return name;
+	public Link getLeftButton() {
+		return leftButton;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setLeftButton(Link leftButton) {
+		this.leftButton = leftButton;
 	}
 
-	public String getSlug() {
-		return slug;
+	public Link getRightButton() {
+		return rightButton;
 	}
 
-	public void setSlug(String slug) {
-		this.slug = slug;
-	}
-
-	public List<Component> getComponents() {
-		return components;
-	}
-
-	public void setComponents(List<Component> components) {
-		this.components = components;
+	public void setRightButton(Link rightButton) {
+		this.rightButton = rightButton;
 	}
 }

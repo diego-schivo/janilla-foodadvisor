@@ -21,29 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.client;
+package com.janilla.foodadvisor.api;
 
-import java.util.Locale;
+import java.io.IOException;
 
-import com.janilla.foodadvisor.api.Global;
-import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
-import com.janilla.web.Render;
+import com.janilla.http.HttpExchange;
+import com.janilla.web.MethodHandlerFactory;
+import com.janilla.web.MethodInvocation;
 
-@Render(template = "Layout.html")
-public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements Renderer {
-
-	public Navbar navbar() {
-		return new Navbar(global != null ? global.getNavigation() : null);
-	}
+public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	@Override
-	public boolean evaluate(RenderEngine engine) {
-		record A(Layout layout, Object content) {
-		}
-		return engine.match(A.class, (i, o) -> {
-			o.setValue(entry.getValue());
-			o.setType(entry.getType());
-		});
+	protected void handle(MethodInvocation invocation, HttpExchange exchange) throws IOException {
+		var e = (FoodAdvisorApiApp.Exchange) exchange;
+		var q = e.getRequest();
+		var p = q.getURI().getPath();
+		if (q.getMethod().name().equals("GET") && (p.equals("/admin") || p.equals("/templates.js")))
+			;
+		else if (q.getMethod().name().equals("POST") && p.equals("/admin/login"))
+			;
+		else
+			e.requireUser();
+		super.handle(invocation, exchange);
 	}
 }

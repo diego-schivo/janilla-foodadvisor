@@ -21,66 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.core;
-
-import java.util.List;
-
-import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
-import com.janilla.reflect.Order;
-import com.janilla.web.Render;
-
-@Render(template = "Hero.html")
-public class Hero implements Component, Renderer {
-
-	@Order(1)
-	private List<String> images;
-
-	@Order(2)
-	private String title;
-
-	@Order(3)
-	private String text;
-
-	@Order(4)
-	private List<Link> buttons;
-
-	public List<String> getImages() {
-		return images;
-	}
-
-	public void setImages(List<String> images) {
-		this.images = images;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
-	}
-
-	public List<Link> getButtons() {
-		return buttons;
-	}
-
-	public void setButtons(List<Link> buttons) {
-		this.buttons = buttons;
-	}
-
-	@Override
-	public boolean evaluate(RenderEngine engine) {
-		record A(String[] images, int index) {
-		}
-		return engine.match(A.class, (i, o) -> o.setTemplate("Hero-Image.html"));
-	}
-}
+//package com.janilla.foodadvisor.api;
+//
+//import java.util.Locale;
+//import java.util.Map;
+//
+//public interface Localized<T> extends Map<Locale, T> {
+//}

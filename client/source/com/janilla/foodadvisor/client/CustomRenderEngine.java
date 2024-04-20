@@ -23,27 +23,31 @@
  */
 package com.janilla.foodadvisor.client;
 
+import java.lang.reflect.AnnotatedParameterizedType;
+import java.lang.reflect.AnnotatedType;
 import java.util.Locale;
+import java.util.Map;
 
-import com.janilla.foodadvisor.api.Global;
 import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
-import com.janilla.web.Render;
 
-@Render(template = "Layout.html")
-public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements Renderer {
+public class CustomRenderEngine extends RenderEngine {
 
-	public Navbar navbar() {
-		return new Navbar(global != null ? global.getNavigation() : null);
+	protected Locale locale;
+
+	public void setLocale(Locale locale) {
+		this.locale = locale;
 	}
 
 	@Override
-	public boolean evaluate(RenderEngine engine) {
-		record A(Layout layout, Object content) {
+	protected Entry entryOf(Object key, Object value, AnnotatedType type) {
+		if (value instanceof Map<?, ?> m && type instanceof AnnotatedParameterizedType t) {
+			var aa = t.getAnnotatedActualTypeArguments();
+			if (aa.length == 2 && aa[0].getType() == Locale.class) {
+				var v = m.containsKey(locale) ? m.get(locale)
+						: !locale.equals(Locale.ENGLISH) ? m.get(Locale.ENGLISH) : null;
+				return super.entryOf(key, v, aa[1]);
+			}
 		}
-		return engine.match(A.class, (i, o) -> {
-			o.setValue(entry.getValue());
-			o.setType(entry.getType());
-		});
+		return super.entryOf(key, value, type);
 	}
 }

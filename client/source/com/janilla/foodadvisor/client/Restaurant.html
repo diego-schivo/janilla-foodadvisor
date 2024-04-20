@@ -1,7 +1,7 @@
 <div class="restaurant-details">
 	<div>
 		<div>
-			<img src="${image}" alt="" />
+			<img src="${images[0]}" alt="" />
 		</div>
 		<div>
 			<h2 class="category">${category}</h2>
@@ -9,6 +9,7 @@
 			<p class="description">${description}</p>
 		</div>
 	</div>
+	<img src="/files/${image}" alt="" />
 </div>
 
 <template id="Restaurant-List">
@@ -21,7 +22,7 @@
 
 <template id="Restaurant-Item">
 	<a href="/restaurants/${slug}" class="card">
-		<img src="${image}" alt="" />
+		<img src="${images[0]}" alt="" />
 		<div>
 			<p class="place">${place}</p>
 			<p class="name">${name}</p>

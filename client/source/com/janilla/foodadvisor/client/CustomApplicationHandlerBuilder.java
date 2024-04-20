@@ -23,27 +23,20 @@
  */
 package com.janilla.foodadvisor.client;
 
-import java.util.Locale;
+import com.janilla.web.AnnotationDrivenToMethodInvocation;
+import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.MethodHandlerFactory;
 
-import com.janilla.foodadvisor.api.Global;
-import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
-import com.janilla.web.Render;
-
-@Render(template = "Layout.html")
-public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements Renderer {
-
-	public Navbar navbar() {
-		return new Navbar(global != null ? global.getNavigation() : null);
-	}
+public class CustomApplicationHandlerBuilder extends ApplicationHandlerBuilder {
 
 	@Override
-	public boolean evaluate(RenderEngine engine) {
-		record A(Layout layout, Object content) {
-		}
-		return engine.match(A.class, (i, o) -> {
-			o.setValue(entry.getValue());
-			o.setType(entry.getType());
+	protected MethodHandlerFactory buildMethodHandlerFactory() {
+		var f = super.buildMethodHandlerFactory();
+		((AnnotationDrivenToMethodInvocation) f.getToInvocation()).setComparator((i1, i2) -> {
+			var p1 = i1.object().getClass() == PageWeb.class;
+			var p2 = i2.object().getClass() == PageWeb.class;
+			return Boolean.compare(p1, p2);
 		});
+		return f;
 	}
 }

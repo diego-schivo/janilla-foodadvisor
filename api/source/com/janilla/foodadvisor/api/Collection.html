@@ -1,5 +1,4 @@
 <div class="collection">
-	<h2>${name}</h2>
 	<!--${list}-->
 	<!--${form}-->
 </div>
@@ -9,20 +8,19 @@
 </template>
 
 <template id="Collection-List">
-	<div class="list">
-		<button class="create">Create</button>
-		<table>
-			<thead>
-				<tr>
-					<!--${headers}-->
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<!--${rows}-->
-			</tbody>
-		</table>
-	</div>
+	<table class="list">
+		<thead>
+			<tr>
+				<!--${headers}-->
+				<th>
+					<button class="create">Create</button>
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!--${rows}-->
+		</tbody>
+	</table>
 </template>
 
 <template id="Collection-Header">
@@ -44,18 +42,10 @@
 
 <template id="Collection-Form">
 	<form class="form">
-		<!--${fields}-->
-		<button class="save">Save</button>
-	</form>
-</template>
-
-<template id="Collection-Field">
-	<div class="field">
-		<label for="${name}">${label}</label>
 		<!--${control}-->
-	</div>
-</template>
-
-<template id="Collection-Text">
-	<input id="${name}" name="${name}" value="${value}" />
+		<div>
+			<button class="save">Save</button>
+			<button class="cancel">Cancel</button>
+		</div>
+	</form>
 </template>

@@ -21,11 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-module com.janilla.foodadvisor.core {
+class LocalSwitch {
+	
+	selector;
 
-	exports com.janilla.foodadvisor.core;
-
-	opens com.janilla.foodadvisor.core;
-
-	requires transitive com.janilla;
+	listen = () => {
+		this.selector().querySelector('button').addEventListener('click', this.handleButtonClick);
+	}
+	
+	handleButtonClick = () => {
+		this.selector().classList.toggle('active');
+	}
 }
+
+export default LocalSwitch;

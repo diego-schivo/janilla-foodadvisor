@@ -21,92 +21,64 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.core;
+package com.janilla.foodadvisor.api;
 
-import java.net.URI;
+import java.util.List;
 
-import com.janilla.persistence.Index;
-import com.janilla.persistence.Store;
 import com.janilla.reflect.Order;
+import com.janilla.web.Render;
 
-@Store
-public class Restaurant {
+@Render(template = "Hero.html")
+public class Hero implements Component { // , Renderer {
 
 	@Order(1)
-	private long id;
+	private List<Long> images;
 
 	@Order(2)
-	private String name;
+	private String title;
 
-	@Index
 	@Order(3)
-	private String slug;
+	private String text;
 
 	@Order(4)
-	private URI image;
+	private List<Link> buttons;
 
-	@Order(5)
-	private String description;
-
-	@Order(6)
-	private String category;
-
-	@Order(7)
-	private String place;
-
-	public long getId() {
-		return id;
+	public List<@Render(template = "Hero-Image.html") Long> getImages() {
+		return images;
 	}
 
-	public void setId(long id) {
-		this.id = id;
+	public void setImages(List<Long> images) {
+		this.images = images;
 	}
 
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
-	public String getSlug() {
-		return slug;
+	public String getText() {
+		return text;
 	}
 
-	public void setSlug(String slug) {
-		this.slug = slug;
+	public void setText(String text) {
+		this.text = text;
 	}
 
-	public URI getImage() {
-		return image;
+	public List<Link> getButtons() {
+		return buttons;
 	}
 
-	public void setImage(URI image) {
-		this.image = image;
+	public void setButtons(List<Link> buttons) {
+		this.buttons = buttons;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
-	public String getPlace() {
-		return place;
-	}
-
-	public void setPlace(String place) {
-		this.place = place;
-	}
+//	@Override
+//	public boolean evaluate(RenderEngine engine) {
+//		record A(URI[] images, int index) {
+//		}
+//		return engine.match(A.class, (i, o) -> o.setTemplate("Hero-Image.html"));
+//	}
 }

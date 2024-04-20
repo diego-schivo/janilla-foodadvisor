@@ -21,29 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.client;
+package com.janilla.foodadvisor.api;
 
-import java.util.Locale;
+import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.MethodHandlerFactory;
 
-import com.janilla.foodadvisor.api.Global;
-import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
-import com.janilla.web.Render;
-
-@Render(template = "Layout.html")
-public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements Renderer {
-
-	public Navbar navbar() {
-		return new Navbar(global != null ? global.getNavigation() : null);
-	}
+public class CustomHandlerBuilder extends ApplicationHandlerBuilder {
 
 	@Override
-	public boolean evaluate(RenderEngine engine) {
-		record A(Layout layout, Object content) {
-		}
-		return engine.match(A.class, (i, o) -> {
-			o.setValue(entry.getValue());
-			o.setType(entry.getType());
+	protected MethodHandlerFactory buildMethodHandlerFactory() {
+		var r = new CustomArgumentsResolver();
+		r.setTypeResolver(x -> {
+			try {
+				return Class.forName("com.janilla.foodadvisor.api." + x.replace('.', '$'));
+			} catch (ClassNotFoundException f) {
+				throw new RuntimeException(f);
+			}
 		});
+		var f = super.buildMethodHandlerFactory();
+		f.setArgumentsResolver(r);
+		return f;
 	}
 }

@@ -21,50 +21,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.core;
+package com.janilla.foodadvisor.api;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.UncheckedIOException;
+import java.util.Map;
 import java.util.Properties;
-import java.util.stream.Stream;
 
-import com.janilla.persistence.ApplicationPersistenceBuilder;
+import com.janilla.http.HttpExchange;
+import com.janilla.io.IO;
+import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
-import com.janilla.reflect.Reflection;
+import com.janilla.web.UnauthenticatedException;
 
-public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
+abstract class CustomExchange extends HttpExchange {
 
-	@Override
-	public Persistence build() throws IOException {
-		if (file == null) {
-			Properties c;
-			try {
-				c = (Properties) Reflection.getter(application.getClass(), "configuration").invoke(application);
-			} catch (ReflectiveOperationException e) {
-				throw new RuntimeException(e);
-			}
-			var p = c.getProperty("foodadvisor.database.file");
-			if (p.startsWith("~"))
-				p = System.getProperty("user.home") + p.substring(1);
-			file = Path.of(p);
+	Properties configuration;
+
+	Persistence persistence;
+
+	private IO.Supplier<User> user = IO.Lazy.of(() -> {
+		var a = getRequest().getHeaders().get("Authorization");
+		var t = a != null && a.startsWith("Bearer ") ? a.substring("Bearer ".length()) : null;
+		Map<String, ?> p;
+		try {
+			p = t != null ? Jwt.verifyToken(t, configuration.getProperty("foodadvisor.jwt.key")) : null;
+		} catch (IllegalArgumentException e) {
+			p = null;
 		}
-		var e = Files.exists(file);
-		var p = super.build();
-		p.setTypeResolver(x -> {
-			try {
-				return Class.forName("com.janilla.foodadvisor.core." + x);
-			} catch (ClassNotFoundException f) {
-				throw new RuntimeException(f);
-			}
-		});
-		if (!e) {
+		var e = p != null ? (String) p.get("sub") : null;
+		var c = persistence.getCrud(User.class);
+		var i = e != null ? c.find("email", e) : 0;
+		var u = i > 0 ? c.read(i) : null;
+		return u;
+	});
+
+	public User getUser() {
+		try {
+			return user.get();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-		return p;
 	}
 
-	@Override
-	protected Stream<String> getPackageNames() {
-		return Stream.concat(super.getPackageNames(), Stream.of("com.janilla.foodadvisor.core"));
+	public void requireUser() {
+		var u = getUser();
+		if (u == null)
+			throw new UnauthenticatedException();
 	}
 }

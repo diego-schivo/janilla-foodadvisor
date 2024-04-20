@@ -21,25 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.api;
+package com.janilla.foodadvisor.client;
 
-import com.janilla.web.ApplicationHandlerBuilder;
-import com.janilla.web.MethodHandlerFactory;
+import java.util.Locale;
+import java.util.function.Supplier;
 
-public class CustomApplicationHandlerBuilder extends ApplicationHandlerBuilder {
+import com.janilla.http.Http;
+import com.janilla.http.HttpExchange;
+import com.janilla.util.Lazy;
 
-	@Override
-	protected MethodHandlerFactory buildMethodHandlerFactory() {
-		var r = new CustomMethodArgumentsResolver();
-		r.setTypeResolver(x -> {
-			try {
-				return Class.forName("com.janilla.foodadvisor.core." + x);
-			} catch (ClassNotFoundException f) {
-				throw new RuntimeException(f);
-			}
-		});
-		var f = super.buildMethodHandlerFactory();
-		f.setArgumentsResolver(r);
-		return f;
+abstract class CustomExchange extends HttpExchange {
+
+	protected Locale locale;
+
+	protected Supplier<Locale> cookieLocale = Lazy.of(() -> {
+		var hh = getRequest().getHeaders();
+		var h = hh != null ? hh.get("Cookie") : null;
+		var cc = h != null ? Http.parseCookieHeader(h) : null;
+		var s = cc != null ? cc.get("lang") : null;
+		return s != null ? Locale.forLanguageTag(s) : Locale.ENGLISH;
+	});
+
+	public Locale getLocale() {
+		return locale != null ? locale : cookieLocale.get();
+	}
+
+	public void setLocale(Locale locale) {
+		if (this.locale != null)
+			throw new IllegalStateException();
+		this.locale = locale;
+		getResponse().getHeaders().add("Set-Cookie",
+				Http.formatSetCookieHeader("lang", locale.toLanguageTag(), null, "/", "strict"));
 	}
 }

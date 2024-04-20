@@ -48,7 +48,7 @@ public class CollectionWeb {
 	@Handle(method = "GET", path = "/api/collections/(\\w+)")
 	public <T> List<T> getCollection(String name) throws ClassNotFoundException, IOException {
 		@SuppressWarnings("unchecked")
-		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.core." + name);
+		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.api." + name);
 		var ii = persistence.getCrud(c).list();
 		return persistence.getCrud(c).read(ii).toList();
 	}
@@ -56,21 +56,21 @@ public class CollectionWeb {
 	@Handle(method = "GET", path = "/api/collections/(\\w+)/(\\d+)")
 	public <T> T getCollection(String name, long id) throws ClassNotFoundException, IOException {
 		@SuppressWarnings("unchecked")
-		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.core." + name);
+		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.api." + name);
 		return persistence.getCrud(c).read(id);
 	}
 
 	@Handle(method = "POST", path = "/api/collections/(\\w+)")
 	public <T> void createCollection(String name, T object) throws ClassNotFoundException, IOException {
 		@SuppressWarnings("unchecked")
-		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.core." + name);
+		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.api." + name);
 		persistence.getCrud(c).create(object);
 	}
 
 	@Handle(method = "PUT", path = "/api/collections/(\\w+)/(\\d+)")
 	public <T> void updateCollection(String name, long id, T object) throws ClassNotFoundException, IOException {
 		@SuppressWarnings("unchecked")
-		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.core." + name);
+		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.api." + name);
 		persistence.getCrud(c).update(id, t -> Reflection.copy(object, t, n -> !n.equals("id")));
 	}
 }

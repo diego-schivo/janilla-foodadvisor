@@ -1,0 +1,6 @@
+.list-control,
+.map-control,
+.object-control {
+	border: 1px solid grey;
+	padding: .5rem;
+}

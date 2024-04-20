@@ -1,0 +1,26 @@
+<div class="list-control control">
+	<ol>
+		<!--${items}-->
+	</ol>
+	<button class="add" name="${name}">Add</button>
+	<!--${dialog}-->
+</div>
+
+<template id="ListControl-Item">
+	<li class="item">
+		<!--${control}-->
+	</li>
+</template>
+
+<template id="ListControl-Dialog">
+	<dialog class="dialog">
+		<select class="type">
+			<option value=""></option>
+			<!--${types}-->
+		</select>
+	</dialog>
+</template>
+
+<template id="ListControl-Option">
+	<option value="${}">${}</option>
+</template>

@@ -23,13 +23,84 @@
  */
 package com.janilla.foodadvisor.api;
 
+import java.io.IOException;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.util.Arrays;
+import java.util.HexFormat;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.IntStream;
+
+import com.janilla.http.HttpRequest;
+import com.janilla.json.Jwt;
+import com.janilla.net.Net;
+import com.janilla.persistence.Persistence;
+import com.janilla.util.Util;
 import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
 public class AdminWeb {
 
+	private Persistence persistence;
+
+	private Properties configuration;
+
+	public void setPersistence(Persistence persistence) {
+		this.persistence = persistence;
+	}
+
+	public void setConfiguration(Properties configuration) {
+		this.configuration = configuration;
+	}
+
 	@Handle(method = "GET", path = "/admin")
 	public @Render(template = "Admin.html") Object getPage() {
 		return "page";
+	}
+
+	@Handle(method = "POST", path = "/admin/login")
+	public String login(Credential credential) throws IOException {
+		var i = persistence.getCrud(User.class).find("email", credential.email);
+		var u = i > 0 ? persistence.getCrud(User.class).read(i) : null;
+		{
+			var f = HexFormat.of();
+			var h = f.formatHex(
+					CustomPersistenceBuilder.hash(credential.password.toCharArray(), f.parseHex(u.getSalt())));
+			if (!h.equals(u.getHash()))
+				u = null;
+		}
+		var h = Map.of("alg", "HS256", "typ", "JWT");
+		var p = Map.of("sub", u.getEmail());
+		var t = Jwt.generateToken(h, p, configuration.getProperty("foodadvisor.jwt.key"));
+		return t;
+	}
+
+	@Handle(method = "POST", path = "/admin/upload")
+	public long upload(HttpRequest request) throws IOException {
+		byte[] bb;
+		{
+			var b = request.getHeaders().get("Content-Type").split(";")[1].trim().substring("boundary=".length());
+			var c = (ReadableByteChannel) request.getBody();
+			var cc = Channels.newInputStream(c).readAllBytes();
+			var s = ("--" + b).getBytes();
+			var ii = Util.findIndexes(cc, s);
+			bb = IntStream.range(0, ii.length - 1)
+					.mapToObj(i -> Arrays.copyOfRange(cc, ii[i] + s.length + 2, ii[i + 1] - 2)).findFirst().orElse(null);
+		}
+		var i = Util.findIndexes(bb, "\r\n\r\n".getBytes(), 1)[0];
+		var hh = Net.parseEntryList(new String(bb, 0, i), "\r\n", ":");
+		System.out.println(hh);
+		var f = new File();
+		f.setName(Arrays.stream(hh.get("Content-Disposition").split(";")).map(String::trim)
+				.filter(x -> x.startsWith("filename=")).map(x -> x.substring(x.indexOf('=') + 1))
+				.map(x -> x.startsWith("\"") && x.endsWith("\"") ? x.substring(1, x.length() - 1) : x).findFirst()
+				.orElseThrow());
+		f.setBytes(Arrays.copyOfRange(bb, i + 4, bb.length));
+		persistence.getCrud(File.class).create(f);
+		return f.getId();
+	}
+
+	public record Credential(String email, String password) {
 	}
 }

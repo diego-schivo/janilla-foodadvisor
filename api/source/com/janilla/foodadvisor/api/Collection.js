@@ -21,42 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import ComponentList from './ComponentList.js';
+import ObjectControl from './ObjectControl.js';
 
 class Collection {
 
 	selector;
 
+	type;
+
 	engine;
 
-	name;
-
-	properties;
-
-	headers;
+	headers = ['id', 'name'];
 
 	rows;
 
-	id;
-
 	content;
 
-	componentList;
+	control;
 
 	render = async engine => {
 		return await engine.match([this], async (_, o) => {
 			this.engine = engine.clone();
-			if (this.name == null)
-				o.template = 'Collection-empty';
-			else {
-				const s = await fetch(`/api/types/${this.name}/properties`);
-				this.properties = await s.json();
-				this.headers = this.properties.filter(x => ['id', 'name'].includes(x));
-				o.template = 'Collection';
+			switch (this.type) {
+				case 'Global':
+					const s = await fetch(`/api/collections/${this.type}`, {
+						headers: engine.app.apiHeaders
+					});
+					const j = await s.json();
+					this.content = j.length ? j[0] : { $type: this.type };
+					break;
 			}
+			delete this.control;
+			o.template = this.type != null ? 'Collection' : 'Collection-empty';
 		}) || await engine.match(['list'], async (_, o) => {
 			if (!this.content) {
-				const s = await fetch(`/api/collections/${this.name}`);
+				const s = await fetch(`/api/collections/${this.type}`, {
+					headers: engine.app.apiHeaders
+				});
 				this.rows = await s.json();
 				o.template = 'Collection-List';
 			}
@@ -69,39 +70,26 @@ class Collection {
 		}) || await engine.match(['cells', 'number'], async (_, o) => {
 			o.template = 'Collection-Cell'
 		}) || await engine.match(['form'], async (_, o) => {
-			if (this.content)
+			if (this.content) {
+				const c = new ObjectControl();
+				c.selector = () => this.selector().querySelector('.form').firstElementChild;
+				c.binding = {
+					getter: () => this.content,
+					setter: x => this.content = x
+				};
+				c.type = this.type;
+				this.control = c;
 				o.template = 'Collection-Form';
-		}) || await engine.match(['fields'], async (_, o) => {
-			o.value = this.properties.filter(x => x !== 'id').map(x => ({
-				name: x,
-				label: x,
-				value: this.content[x]
-			}));
-		}) || await engine.match(['fields', 'number'], async (_, o) => {
-			o.template = 'Collection-Field';
-		}) || await engine.match([undefined, 'control'], async (i, o) => {
-			switch (i[0].name) {
-				case 'components':
-					const c = new ComponentList();
-					c.name = i[0].name;
-					c.items = i[0].value;
-					c.selector = () => {
-						return this.selector().querySelector('label[for="components"]').nextElementSibling;
-					};
-					o.value = this.componentList = c;
-					break;
-				default:
-					o.template = 'Collection-Text';
-					break;
 			}
 		});
 	}
 
 	listen = () => {
-		this.selector().querySelector('.create')?.addEventListener('click', this.handleCreateClick);
+		this.selector().querySelector('.create:not([name])')?.addEventListener('click', this.handleCreateClick);
 		this.selector().querySelectorAll('.edit').forEach(x => x.addEventListener('click', this.handleEditClick));
 		this.selector().querySelector('.save')?.addEventListener('click', this.handleSaveClick);
-		this.componentList?.listen();
+		this.selector().querySelector('.cancel')?.addEventListener('click', this.handleCancelClick);
+		this.control?.listen();
 	}
 
 	refresh = async () => {
@@ -110,30 +98,38 @@ class Collection {
 	}
 
 	handleCreateClick = async () => {
-		this.content = {};
-		this.refresh();
+		this.content = { $type: this.type };
+		await this.refresh();
 	}
 
 	handleEditClick = async event => {
 		const b = event.currentTarget;
-		this.id = parseInt(b.value, 10);
-		const s = await fetch(`/api/collections/${this.name}/${this.id}`);
+		const i = parseInt(b.value, 10);
+		const s = await fetch(`/api/collections/${this.type}/${i}`, {
+			headers: this.engine.app.apiHeaders
+		});
 		this.content = await s.json();
-		this.refresh();
+		await this.refresh();
 	}
 
 	handleSaveClick = async event => {
 		const b = event.currentTarget;
 		event.preventDefault();
-		const r = this.id ? `/api/collections/${this.name}/${this.id}` : `/api/collections/${this.name}`;
+		const i = this.content.id;
+		const r = i != null ? `/api/collections/${this.type}/${i}` : `/api/collections/${this.type}`;
 		await fetch(r, {
-			method: this.id ? 'PUT' : 'POST',
+			method: i != null ? 'PUT' : 'POST',
+			headers: this.engine.app.apiHeaders,
 			body: new URLSearchParams(new FormData(b.form, b))
 		});
-		delete this.id;
 		delete this.content;
-		delete this.componentList;
-		this.refresh();
+		await this.refresh();
+	}
+
+	handleCancelClick = async event => {
+		event.preventDefault();
+		delete this.content;
+		await this.refresh();
 	}
 }
 

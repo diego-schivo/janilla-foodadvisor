@@ -22,45 +22,93 @@
  * SOFTWARE.
  */
 import Collection from './Collection.js';
+import Login from './Login.js';
 import RenderEngine from './RenderEngine.js';
 
 class Admin {
 
 	selector = () => document.body.firstElementChild;
 
+	engine;
+
+	types;
+
 	collection;
+	
+	login;
+	
+	get apiHeaders() {
+		const t = sessionStorage.getItem('jwtToken');
+		return t ? { Authorization: `Bearer ${t}` } : {};
+	}
 
 	run = async () => {
-		const e = new RenderEngine();
+		const e = new CustomRenderEngine();
 		const h = await e.render({ value: this });
 		document.body.innerHTML = h;
 		this.listen();
 	}
 
 	render = async engine => {
-		return await engine.match([this], async (_, o) => o.template = 'Admin-Body')
-			|| await engine.match([this, 'collections'], async (_, o) => {
-				const s = await fetch('/api/collections');
-				o.value = await s.json();
-			}) || await engine.match([this, 'collections', 'number'], async (_, o) => o.template = 'Admin-Collection')
-			|| await engine.match([this, 'collection'], async (_, o) => {
-				const c = new Collection();
-				c.selector = () => this.selector().children[1];
-				o.value = this.collection = c;
+		return await engine.match([this], async (_, o) => {
+			this.engine = engine.clone();
+			['collection', 'login'].forEach(x => delete this[x]);
+			const s = await fetch('/api/collections', {
+				headers: this.apiHeaders
 			});
+			if (s.ok) {
+				this.types = await s.json();
+				const c = new Collection();
+				c.selector = () => this.selector().querySelector('.collection');
+				this.collection = c;
+				o.template = 'Admin-authenticated';
+			} else if (s.status === 401) {
+				const l = new Login();
+				l.selector = () => this.selector().querySelector('.login');
+				this.login = l;
+				o.template = 'Admin-unauthenticated';
+			}
+		}) || await engine.match([this.types, 'number'], async (_, o) => {
+			o.template = 'Admin-Option';
+		});
 	}
 
 	listen = () => {
-		this.selector().firstElementChild.addEventListener('click', this.handleClick);
+		const e = this.selector();
+		e.addEventListener('login', this.handleLogin);
+		e.querySelector('.type')?.addEventListener('change', this.handleTypeChange);
+		this.collection?.listen();
+		this.login?.listen();
 	}
 
-	handleClick = event => {
-		const a = event.target.closest('a');
-		if (!a)
-			return;
-		event.preventDefault();
-		this.collection.name = a.textContent;
+	refresh = async () => {
+		this.selector().outerHTML = await this.engine.render({ value: this });
+		this.listen();
+	}
+	
+	handleLogin = async event => {
+		sessionStorage.setItem('jwtToken', event.detail.token);
+		await this.refresh();
+	}
+
+	handleTypeChange = event => {
+		const s = event.currentTarget;
+		this.collection.type = s.value;
+		delete this.collection.content;
 		this.collection.refresh();
+	}
+}
+
+class CustomRenderEngine extends RenderEngine {
+
+	get app() {
+		return this.stack[0].value;
+	}
+
+	clone() {
+		const e = new CustomRenderEngine();
+		e.stack = [...this.stack];
+		return e;
 	}
 }
 
