@@ -23,13 +23,17 @@
  */
 import ObjectControl from './ObjectControl.js';
 
-class Collection {
+class Content {
 
 	selector;
 
-	type;
+	mode;
+
+	typeReference;
 
 	engine;
+
+	type;
 
 	headers = ['id', 'name'];
 
@@ -42,53 +46,68 @@ class Collection {
 	render = async engine => {
 		return await engine.match([this], async (_, o) => {
 			this.engine = engine.clone();
+			const t = this.typeReference.getType();
+			if (t !== this.type) {
+				this.type = t;
+				delete this.content;
+			}
 			switch (this.type) {
 				case 'Global':
-					const s = await fetch(`/api/collections/${this.type}`, {
-						headers: engine.app.apiHeaders
+					const s = await fetch(`/api/contents/${this.type}`, {
+						headers: engine.admin.apiHeaders
 					});
 					const j = await s.json();
 					this.content = j.length ? j[0] : { $type: this.type };
 					break;
 			}
 			delete this.control;
-			o.template = this.type != null ? 'Collection' : 'Collection-empty';
+			o.template = this.type != null ? 'Content' : 'Content-empty';
 		}) || await engine.match(['list'], async (_, o) => {
 			if (!this.content) {
-				const s = await fetch(`/api/collections/${this.type}`, {
-					headers: engine.app.apiHeaders
+				const s = await fetch(`/api/contents/${this.type}`, {
+					headers: engine.admin.apiHeaders
 				});
 				this.rows = await s.json();
-				o.template = 'Collection-List';
+				o.template = 'Content-List';
 			}
 		}) || await engine.match(['headers', 'number'], async (_, o) => {
-			o.template = 'Collection-Header';
+			o.template = 'Content-Header';
+		}) || await engine.match(['createButton'], async (_, o) => {
+			if (this.mode == null)
+				o.template = 'Content-createButton';
 		}) || await engine.match(['rows', 'number'], async (_, o) => {
-			o.template = 'Collection-Row';
+			o.template = 'Content-Row';
 		}) || await engine.match([undefined, 'cells'], async (i, o) => {
 			o.value = this.headers.map(x => i[0][x]);
 		}) || await engine.match(['cells', 'number'], async (_, o) => {
-			o.template = 'Collection-Cell'
+			o.template = 'Content-Cell'
+		}) || await engine.match(['editButton'], async (_, o) => {
+			if (this.mode == null)
+				o.template = 'Content-editButton';
+		}) || await engine.match(['selectButton'], async (_, o) => {
+			if (this.mode === 'select')
+				o.template = 'Content-selectButton';
 		}) || await engine.match(['form'], async (_, o) => {
 			if (this.content) {
 				const c = new ObjectControl();
 				c.selector = () => this.selector().querySelector('.form').firstElementChild;
-				c.binding = {
-					getter: () => this.content,
-					setter: x => this.content = x
+				c.reference = {
+					getValue: () => this.content,
+					setValue: x => this.content = x
 				};
 				c.type = this.type;
 				this.control = c;
-				o.template = 'Collection-Form';
+				o.template = 'Content-Form';
 			}
 		});
 	}
 
 	listen = () => {
-		this.selector().querySelector('.create:not([name])')?.addEventListener('click', this.handleCreateClick);
-		this.selector().querySelectorAll('.edit').forEach(x => x.addEventListener('click', this.handleEditClick));
-		this.selector().querySelector('.save')?.addEventListener('click', this.handleSaveClick);
-		this.selector().querySelector('.cancel')?.addEventListener('click', this.handleCancelClick);
+		this.selector().querySelector(':scope > .list .create')?.addEventListener('click', this.handleCreateClick);
+		this.selector().querySelectorAll(':scope > .list .edit').forEach(x => x.addEventListener('click', this.handleEditClick));
+		this.selector().querySelectorAll(':scope > .list .select').forEach(x => x.addEventListener('click', this.handleSelectClick));
+		this.selector().querySelector(':scope > .form')?.addEventListener('submit', this.handleFormSubmit);
+		this.selector().querySelector(':scope > .form .cancel')?.addEventListener('click', this.handleCancelClick);
 		this.control?.listen();
 	}
 
@@ -103,34 +122,40 @@ class Collection {
 	}
 
 	handleEditClick = async event => {
-		const b = event.currentTarget;
-		const i = parseInt(b.value, 10);
-		const s = await fetch(`/api/collections/${this.type}/${i}`, {
-			headers: this.engine.app.apiHeaders
+		const i = parseInt(event.currentTarget.value, 10);
+		const s = await fetch(`/api/contents/${this.type}/${i}`, {
+			headers: this.engine.admin.apiHeaders
 		});
 		this.content = await s.json();
 		await this.refresh();
 	}
 
-	handleSaveClick = async event => {
-		const b = event.currentTarget;
+	handleSelectClick = async event => {
+		const i = parseInt(event.currentTarget.value, 10);
+		this.selector().dispatchEvent(new CustomEvent('contentselect', {
+			bubbles: true,
+			detail: { id: i }
+		}));
+	}
+
+	handleFormSubmit = async event => {
 		event.preventDefault();
+		const f = event.currentTarget;
 		const i = this.content.id;
-		const r = i != null ? `/api/collections/${this.type}/${i}` : `/api/collections/${this.type}`;
+		const r = i != null ? `/api/contents/${this.type}/${i}` : `/api/contents/${this.type}`;
 		await fetch(r, {
 			method: i != null ? 'PUT' : 'POST',
-			headers: this.engine.app.apiHeaders,
-			body: new URLSearchParams(new FormData(b.form, b))
+			headers: this.engine.admin.apiHeaders,
+			body: new URLSearchParams(new FormData(f))
 		});
 		delete this.content;
 		await this.refresh();
 	}
 
 	handleCancelClick = async event => {
-		event.preventDefault();
 		delete this.content;
 		await this.refresh();
 	}
 }
 
-export default Collection;
+export default Content;

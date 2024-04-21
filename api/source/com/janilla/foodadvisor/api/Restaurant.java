@@ -23,102 +23,39 @@
  */
 package com.janilla.foodadvisor.api;
 
-import java.net.URI;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 import com.janilla.reflect.Order;
+import com.janilla.web.Render;
 
 @Store
 public class Restaurant {
 
 	@Order(1)
-	private long id;
+	public Long id;
 
 	@Order(2)
-	private String name;
+	public String name;
 
 	@Index
 	@Order(3)
-	private String slug;
+	public String slug;
 
 	@Order(4)
-	private long image;
+	public List<@Render(template = "Restaurant-image.html") Long> images;
 
 	@Order(5)
-	private List<URI> images;
+	public Map<Locale, String> description;
 
+	@Reference(Category.class)
 	@Order(6)
-	private String description;
+	public Long category;
 
+	@Reference(Place.class)
 	@Order(7)
-	private String category;
-
-	@Order(8)
-	private String place;
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getSlug() {
-		return slug;
-	}
-
-	public void setSlug(String slug) {
-		this.slug = slug;
-	}
-
-	public long getImage() {
-		return image;
-	}
-
-	public void setImage(long image) {
-		this.image = image;
-	}
-
-	public List<URI> getImages() {
-		return images;
-	}
-
-	public void setImages(List<URI> images) {
-		this.images = images;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
-	public String getPlace() {
-		return place;
-	}
-
-	public void setPlace(String place) {
-		this.place = place;
-	}
+	public Long place;
 }

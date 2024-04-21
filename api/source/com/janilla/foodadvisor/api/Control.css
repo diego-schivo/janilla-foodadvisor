@@ -1,6 +1,19 @@
+.control {
+	&.odd {
+		background: rgb(47, 47, 47);
+	}
+
+	&.even {
+		background: rgb(31, 31, 31);
+	}
+}
+
 .list-control,
-.map-control,
+.locale-control,
 .object-control {
-	border: 1px solid grey;
-	padding: .5rem;
+	border-radius: .5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 1rem;
 }

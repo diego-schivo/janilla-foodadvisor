@@ -48,7 +48,7 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 		if (l == null) {
 			var ii = persistence.getCrud(Global.class).list(0, 1).ids();
 			var g = ii.length > 0 ? persistence.getCrud(Global.class).read(ii[0]) : null;
-			l = new Layout(((FoodAdvisorClientApp.Exchange) exchange).getLocale(), g, input);
+			l = new Layout(persistence, ((FoodAdvisorClientApp.Exchange) exchange).getLocale(), g, input);
 			if (l != null) {
 				input = RenderEngine.Entry.of(null, l, null);
 				r = true;

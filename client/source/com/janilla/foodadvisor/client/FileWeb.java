@@ -59,7 +59,7 @@ public class FileWeb {
 		if (f == null)
 			throw new NotFoundException();
 		response.setStatus(new Status(200, "OK"));
-		var n = f.getName();
+		var n = f.name;
 		var e = n.substring(n.lastIndexOf('.') + 1);
 		var hh = response.getHeaders();
 		switch (e) {
@@ -67,7 +67,7 @@ public class FileWeb {
 			hh.set("Content-Type", "image/png");
 			break;
 		}
-		var bb = f.getBytes();
+		var bb = f.bytes;
 		hh.set("Content-Length", String.valueOf(bb.length));
 		var b = (WritableByteChannel) response.getBody();
 		IO.write(bb, b);

@@ -26,23 +26,23 @@ package com.janilla.foodadvisor.client;
 import java.util.List;
 import java.util.Locale;
 
+import com.janilla.foodadvisor.api.Global;
 import com.janilla.foodadvisor.api.Link;
-import com.janilla.foodadvisor.api.Navigation;
 import com.janilla.web.Render;
 
 @Render(template = "Navbar.html")
-public record Navbar(Navigation navigation) {
+public record Navbar(Global.Navigation navigation) {
 
 	public @Render(template = "Navbar-Logo.html") Link logo() {
-		return navigation != null ? navigation.getLeftButton() : null;
+		return navigation != null ? navigation.leftButton : null;
 	}
 
 	public @Render(template = "Navbar-Nav.html") List<Link> nav() {
-		return navigation != null ? navigation.getLinks() : null;
+		return navigation != null ? navigation.links : null;
 	}
 
 	public @Render(template = "Navbar-CTA.html") Link cta() {
-		return navigation != null ? navigation.getRightButton() : null;
+		return navigation != null ? navigation.rightButton : null;
 	}
 
 	public LocalSwitch localSwitch() {

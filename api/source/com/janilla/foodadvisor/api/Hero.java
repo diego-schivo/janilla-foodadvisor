@@ -24,61 +24,24 @@
 package com.janilla.foodadvisor.api;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import com.janilla.reflect.Order;
 import com.janilla.web.Render;
 
 @Render(template = "Hero.html")
-public class Hero implements Component { // , Renderer {
+public class Hero { // implements Component {
 
 	@Order(1)
-	private List<Long> images;
+	public List<@Render(template = "Hero-image.html") Long> images;
 
 	@Order(2)
-	private String title;
+	public Map<Locale, String> title;
 
 	@Order(3)
-	private String text;
+	public Map<Locale, String> text;
 
 	@Order(4)
-	private List<Link> buttons;
-
-	public List<@Render(template = "Hero-Image.html") Long> getImages() {
-		return images;
-	}
-
-	public void setImages(List<Long> images) {
-		this.images = images;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public String getText() {
-		return text;
-	}
-
-	public void setText(String text) {
-		this.text = text;
-	}
-
-	public List<Link> getButtons() {
-		return buttons;
-	}
-
-	public void setButtons(List<Link> buttons) {
-		this.buttons = buttons;
-	}
-
-//	@Override
-//	public boolean evaluate(RenderEngine engine) {
-//		record A(URI[] images, int index) {
-//		}
-//		return engine.match(A.class, (i, o) -> o.setTemplate("Hero-Image.html"));
-//	}
+	public List<Link> buttons;
 }

@@ -25,7 +25,7 @@ class FileControl {
 
 	selector;
 	
-	binding;
+	reference;
 
 	engine;
 	
@@ -36,40 +36,50 @@ class FileControl {
 	render = async engine => {
 		return await engine.match([this], async (_, o) => {
 			this.engine = engine.clone();
-			this.value = this.binding.getter();
+			this.value = this.reference.getValue();
 			o.template = 'FileControl';
-		}) || await engine.match(['dialog'], async (_, o) => {
-			o.template = 'FileControl-Dialog';
 		});
 	}
 
 	listen = () => {
-		this.selector().querySelector('button').addEventListener('click', this.handleButtonClick);
+		const e = this.selector();
+		e.querySelector(':scope > .upload').addEventListener('click', this.handleUploadClick);
+		const d = e.querySelector(':scope > .upload-dialog');
+		d?.querySelector('input').addEventListener('change', this.handleFileChange);
+		d?.addEventListener('close', this.handleDialogClose);
+	}
+
+	refresh = async () => {
+		this.selector().outerHTML = await this.engine.render({ value: this });
+		this.listen();
 	}
 	
-	handleButtonClick = event => {
-		event.preventDefault();
-		const d = this.selector().querySelector('dialog');
-		d.querySelector('input').addEventListener('change', this.handleFileChange);
-		d.showModal();
+	handleUploadClick = async () => {
+		const h = await this.engine.render({ template: 'FileControl-uploadDialog' });
+		const e = this.selector();
+		e.insertAdjacentHTML('beforeend', h);
+		e.querySelector(':scope > .upload-dialog').showModal();
+		this.listen();
 	}
 	
 	handleFileChange = event => {
-		const i = event.currentTarget;
 		const d = new FormData();
+		const i = event.currentTarget;
 		d.append(i.name, i.files[0]);
 		const r = this.request = new XMLHttpRequest();
 		r.addEventListener('load', this.handleRequestLoad);
 		r.open('POST', '/admin/upload', true);
-		Object.entries(this.engine.app.apiHeaders).forEach(([h, v]) => r.setRequestHeader(h, v));
+		Object.entries(this.engine.admin.apiHeaders).forEach(([h, v]) => r.setRequestHeader(h, v));
 		r.send(d);
 	}
 	
+	handleDialogClose = async () => {
+		await this.refresh();
+	}
+	
 	handleRequestLoad = () => {
-		const e = this.selector();
-		e.querySelector('dialog').close();
-		e.querySelector('input').value = this.value = this.request.responseText;
-		this.binding.setter(this.value);
+		this.reference.setValue(this.value = this.request.responseText);
+		this.selector().querySelector(':scope > .upload-dialog').close();
 	}
 }
 

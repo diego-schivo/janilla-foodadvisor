@@ -1,0 +1,9 @@
+.login {
+	align-items: center;
+	background: rgb(47, 47, 47);
+	border-radius: .5rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+	padding: 2rem;
+}

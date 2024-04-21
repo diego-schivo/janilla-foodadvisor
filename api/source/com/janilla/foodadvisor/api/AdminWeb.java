@@ -65,13 +65,12 @@ public class AdminWeb {
 		var u = i > 0 ? persistence.getCrud(User.class).read(i) : null;
 		{
 			var f = HexFormat.of();
-			var h = f.formatHex(
-					CustomPersistenceBuilder.hash(credential.password.toCharArray(), f.parseHex(u.getSalt())));
-			if (!h.equals(u.getHash()))
+			var h = f.formatHex(CustomPersistenceBuilder.hash(credential.password.toCharArray(), f.parseHex(u.salt)));
+			if (!h.equals(u.hash))
 				u = null;
 		}
 		var h = Map.of("alg", "HS256", "typ", "JWT");
-		var p = Map.of("sub", u.getEmail());
+		var p = Map.of("sub", u.email);
 		var t = Jwt.generateToken(h, p, configuration.getProperty("foodadvisor.jwt.key"));
 		return t;
 	}
@@ -86,19 +85,19 @@ public class AdminWeb {
 			var s = ("--" + b).getBytes();
 			var ii = Util.findIndexes(cc, s);
 			bb = IntStream.range(0, ii.length - 1)
-					.mapToObj(i -> Arrays.copyOfRange(cc, ii[i] + s.length + 2, ii[i + 1] - 2)).findFirst().orElse(null);
+					.mapToObj(i -> Arrays.copyOfRange(cc, ii[i] + s.length + 2, ii[i + 1] - 2)).findFirst()
+					.orElse(null);
 		}
 		var i = Util.findIndexes(bb, "\r\n\r\n".getBytes(), 1)[0];
 		var hh = Net.parseEntryList(new String(bb, 0, i), "\r\n", ":");
-		System.out.println(hh);
 		var f = new File();
-		f.setName(Arrays.stream(hh.get("Content-Disposition").split(";")).map(String::trim)
+		f.name = Arrays.stream(hh.get("Content-Disposition").split(";")).map(String::trim)
 				.filter(x -> x.startsWith("filename=")).map(x -> x.substring(x.indexOf('=') + 1))
 				.map(x -> x.startsWith("\"") && x.endsWith("\"") ? x.substring(1, x.length() - 1) : x).findFirst()
-				.orElseThrow());
-		f.setBytes(Arrays.copyOfRange(bb, i + 4, bb.length));
+				.orElseThrow();
+		f.bytes = Arrays.copyOfRange(bb, i + 4, bb.length);
 		persistence.getCrud(File.class).create(f);
-		return f.getId();
+		return f.id;
 	}
 
 	public record Credential(String email, String password) {

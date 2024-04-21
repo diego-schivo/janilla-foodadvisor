@@ -23,6 +23,8 @@
  */
 package com.janilla.foodadvisor.api;
 
+import java.util.List;
+
 import com.janilla.persistence.Store;
 import com.janilla.reflect.Order;
 
@@ -30,24 +32,20 @@ import com.janilla.reflect.Order;
 public class Global {
 
 	@Order(1)
-	private long id;
+	public Long id;
 
 	@Order(2)
-	private Navigation navigation;
+	public Navigation navigation;
 
-	public long getId() {
-		return id;
-	}
+	public static class Navigation { // implements Component {
 
-	public void setId(long id) {
-		this.id = id;
-	}
+		@Order(1)
+		public List<Link> links;
 
-	public Navigation getNavigation() {
-		return navigation;
-	}
+		@Order(2)
+		public Link leftButton;
 
-	public void setNavigation(Navigation navigation) {
-		this.navigation = navigation;
+		@Order(3)
+		public Link rightButton;
 	}
 }

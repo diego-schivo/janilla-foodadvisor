@@ -24,7 +24,9 @@
 import LocalSwitch from './LocalSwitch.js';
 
 addEventListener('DOMContentLoaded', () => {
-	var s = new LocalSwitch();
-	s.selector = () => document.querySelector('.local-switch');
-	s.listen();
+	if (document.querySelector('.local-switch')) {
+		var s = new LocalSwitch();
+		s.selector = () => document.querySelector('.local-switch');
+		s.listen();
+	}
 });

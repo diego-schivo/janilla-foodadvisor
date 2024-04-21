@@ -67,7 +67,7 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 		});
 		if (!e) {
 			var u = new User();
-			u.setEmail("admin@example.com");
+			u.email = "admin@example.com";
 			setHashAndSalt(u, "Password1!");
 			p.getCrud(User.class).create(u);
 		}
@@ -87,8 +87,8 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 		random.nextBytes(s);
 		var h = hash(p, s);
 		var f = HexFormat.of();
-		user.setHash(f.formatHex(h));
-		user.setSalt(f.formatHex(s));
+		user.hash = f.formatHex(h);
+		user.salt = f.formatHex(s);
 	}
 
 	static byte[] hash(char[] password, byte[] salt) {

@@ -1,0 +1,22 @@
+<div class="locale-control control ${level}">
+	<button type="button" name="create">Create</button>
+</div>
+
+<template id="LocaleControl-existing">
+	<div class="locale-control control ${level}">
+		<ul class="fields">
+			<!--${entries}-->
+		</ul>
+	</div>
+</template>
+
+<template id="LocaleControl-Entry">
+	<li data-${hidden}>
+		<!--${field}-->
+	</li>
+</template>
+
+<template id="LocaleControl-Field">
+	<label for="${name}">${label}</label>
+	<!--${control}-->
+</template>

@@ -21,10 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-//package com.janilla.foodadvisor.api;
-//
-//import java.util.Locale;
-//import java.util.Map;
-//
-//public interface Localized<T> extends Map<Locale, T> {
-//}
+package com.janilla.foodadvisor.api;
+
+import com.janilla.persistence.Store;
+import com.janilla.reflect.Order;
+
+@Store
+public class Place {
+
+	@Order(1)
+	public Long id;
+
+	@Order(2)
+	public String name;
+}

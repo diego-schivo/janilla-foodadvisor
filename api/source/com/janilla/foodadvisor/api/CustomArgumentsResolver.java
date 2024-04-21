@@ -36,33 +36,13 @@ public class CustomArgumentsResolver extends MethodArgumentsResolver {
 	protected Object resolveArgument(Type type, HttpExchange exchange, Supplier<String[]> values,
 			EntryList<String, String> entries, com.janilla.io.IO.Supplier<String> body) {
 		var q = exchange.getRequest();
-		if (type == Object.class && q.getURI().getPath().startsWith("/api/collections/"))
+		if (type == Object.class && q.getURI().getPath().startsWith("/api/contents/"))
 			try {
 				type = Class.forName("com.janilla.foodadvisor.api."
-						+ q.getURI().getPath().substring("/api/collections/".length()).split("/")[0].replace('.', '$'));
+						+ q.getURI().getPath().substring("/api/contents/".length()).split("/")[0].replace('.', '$'));
 			} catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
 			}
 		return super.resolveArgument(type, exchange, values, entries, body);
 	}
-
-//	@Override
-//	protected EntryTree newEntryTree() {
-//		return new EntryTree() {
-//
-//			@Override
-//			protected <T> T convert(Map<String, Object> tree, Class<T> target) {
-//				var v = tree.get("class");
-//				if (v != null)
-//					try {
-//						@SuppressWarnings("unchecked")
-//						var t = (Class<T>) Class.forName(target.getPackageName() + "." + v);
-//						target = t;
-//					} catch (ClassNotFoundException e) {
-//						throw new RuntimeException(e);
-//					}
-//				return super.convert(tree, target);
-//			}
-//		};
-//	}
 }

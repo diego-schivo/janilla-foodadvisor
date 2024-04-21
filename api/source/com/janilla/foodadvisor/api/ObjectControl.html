@@ -1,17 +1,23 @@
-<div class="object-control control">
-	<!--${fields}-->
-	<button class="delete">Delete</button>
+<div class="object-control control ${level}">
+	<ul class="fields">
+		<!--${fields}-->
+	</ul>
+	<ul class="buttons">
+		<li>
+			<button type="button" class="delete">Delete</button>
+		</li>
+	</ul>
 </div>
 
 <template id="ObjectControl-empty">
-	<div class="object-control control">
-		<button name="${name}" class="create">Create</button>
+	<div class="object-control control ${level}">
+		<button type="button" class="create">Create</button>
 	</div>
 </template>
 
 <template id="ObjectControl-Field">
-	<div class="field">
+	<li>
 		<label for="${name}">${label}</label>
 		<!--${control}-->
-	</div>
+	</li>
 </template>

@@ -23,6 +23,7 @@
  */
 package com.janilla.foodadvisor.api;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.List;
@@ -58,24 +59,31 @@ public class TypeWeb {
 			default:
 				throw new RuntimeException();
 			}
-			return new Property(n, foo(t)[0],
-					aa != null ? Arrays.stream(aa).map(TypeWeb::foo).toArray(String[][]::new) : null);
+			Field f;
+			try {
+				f = c.getDeclaredField(n);
+			} catch (ReflectiveOperationException e) {
+				f = null;
+			}
+			var r = f != null ? f.getAnnotation(Reference.class) : null;
+			var s = r != null ? Arrays.stream(r.value()).map(TypeWeb::toTypeName).toArray(String[]::new) : null;
+			return new Property(n, toTypeName(t),
+					aa != null ? Arrays.stream(aa).map(TypeWeb::toTypeName).toArray(String[]::new) : null, s);
 		}).toList();
 	}
 
-	static String[] foo(Class<?> type) {
+	static String toTypeName(Class<?> type) {
 		if (type == null)
 			return null;
-//		var n = type.getSimpleName();
 		var n = type.getName();
 		if (!type.isPrimitive()) {
 			n = n.substring(type.getPackageName().length() + 1).replace('$', '.');
 			if (type.getPackageName().startsWith("java."))
 				n = n.toLowerCase();
 		}
-		return n.equals("Component") ? new String[] { "Hero", "Features" } : new String[] { n };
+		return n;
 	}
 
-	public record Property(String name, String type, String[][] typeArguments) {
+	public record Property(String name, String type, String[] typeArguments, String[] referenceTypes) {
 	}
 }

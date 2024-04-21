@@ -31,7 +31,7 @@ class ListControl {
 
 	name;
 
-	binding;
+	reference;
 
 	types;
 
@@ -43,28 +43,35 @@ class ListControl {
 
 	controls;
 
+	get level() {
+		return ['even', 'odd'][this.engine.controls.length % 2];
+	}
+
 	render = async engine => {
-		let ii;
 		return await engine.match([this], async (_, o) => {
 			this.engine = engine.clone();
-			this.items = this.binding.getter();
+			this.items = this.reference.getValue();
 			this.controls = [];
 			o.template = 'ListControl';
 		}) || (this.items && await engine.match([this.items, 'number'], async (_, o) => {
-			const i = o.key;
-			const n = `${this.name}[${i}]`;
-			const c = Object.hasOwn(this.items[i], '$type') ? new ObjectControl() : (this.name.endsWith('images') ? new FileControl() : new TextControl());
-			c.selector = () => this.selector().querySelector(`.item:nth-child(${1 + i})`).firstElementChild;
+			const l = o.key;
+			const n = `${this.name}[${l}]`;
+			o.value = {
+				name: n,
+				label: l
+			};
+			o.template = 'ListControl-Item';
+			const c = Object.hasOwn(this.items[l], '$type') ? new ObjectControl() : (this.name.endsWith('images') ? new FileControl() : new TextControl());
+			c.selector = () => this.selector().querySelector(`:scope > ol > :nth-child(${1 + l}) > :last-child`);
 			c.name = n;
-			c.binding = {
-				getter: () => this.items[i],
-				setter: x => this.items[i] = x
+			c.reference = {
+				getValue: () => this.items[l],
+				setValue: x => this.items[l] = x
 			};
 			if (this.types)
-				c.type = this.items[i].$type;
+				c.type = this.items[l].$type;
 			this.control = c;
 			this.controls.push(c);
-			o.template = 'ListControl-Item';
 		})) || await engine.match(['dialog'], async (_, o) => {
 			if (this.types)
 				o.template = 'ListControl-Dialog';
@@ -79,6 +86,7 @@ class ListControl {
 	}
 
 	refresh = async () => {
+		this.engine.stack.pop();
 		this.selector().outerHTML = await this.engine.render({ value: this });
 		this.listen();
 	}
@@ -104,7 +112,7 @@ class ListControl {
 		if (!this.items)
 			this.items = [];
 		this.items.push(item);
-		this.binding.setter(this.items);
+		this.reference.setValue(this.items);
 		await this.refresh();
 	}
 }

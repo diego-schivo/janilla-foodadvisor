@@ -31,13 +31,13 @@ import com.janilla.reflect.Order;
 import com.janilla.web.Render;
 
 @Render(template = "Features.html")
-public class Features implements Component {
+public class Features {
 
 	@Order(1)
 	public Header header;
 
 	@Order(2)
-	public List<Card> cards;
+	public List<@Render(template = "Features-card.html") Card> cards;
 
 	public static class Header {
 
@@ -56,7 +56,8 @@ public class Features implements Component {
 		@Order(2)
 		public Map<Locale, String> text;
 
+		@Reference(Asset.class)
 		@Order(3)
-		public Long image;
+		public @Render(template = "image.html") Long image;
 	}
 }

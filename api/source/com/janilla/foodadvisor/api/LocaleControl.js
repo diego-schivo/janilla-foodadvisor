@@ -21,63 +21,80 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-class MapControl {
+import TextControl from './TextControl.js';
+
+class LocaleControl {
 
 	selector;
 
 	name;
 
-	binding;
+	reference;
 
 	engine;
+	
+	value;
 
 	entries;
 
-	entry;
+	field;
+
+	controls;
+
+	get level() {
+		return ['even', 'odd'][this.engine.controls.length % 2];
+	}
 
 	render = async engine => {
 		return await engine.match([this], async (_, o) => {
 			this.engine = engine.clone();
-			const v = this.binding.getter();
-			this.entries = v != null ? Object.entries(v) : null;
-			o.template = 'MapControl';
+			this.value = this.reference.getValue();
+			if (this.value == null) {
+				['entries', 'field', 'controls'].forEach(x => delete this[x]);
+				o.template = 'LocaleControl';
+			} else {
+				this.entries = engine.admin.availableLocales.map(x => [x, this.value[x]]);
+				this.controls = [];
+				o.template = 'LocaleControl-existing';
+			}
 		}) || (this.entries && await engine.match([this.entries, 'number'], async (_, o) => {
-			o.template = 'MapControl-Entry';
+			const l = o.value[0];
+			const n = `${this.name}.${l}`;
+			const c = new TextControl();
+			c.selector = () => this.selector().querySelector(`label[for="${n}"]`).nextElementSibling;
+			c.reference = {
+				getValue: () => this.value[l],
+				setValue: x => this.value[l] = x
+			};
+			c.name = n;
+			this.field = {
+				label: l,
+				name: n,
+				control: c
+			};
+			this.controls.push(c);
+			o.value = engine.admin.locales.includes(l) ? {} : { hidden: 'hidden' };
+			o.template = 'LocaleControl-Entry';
+		})) || (this.field && await engine.match([this.field], async (_, o) => {
+			o.template = 'LocaleControl-Field';
 		}));
 	}
 
 	listen = () => {
-		const e = this.selector();
-		e.querySelectorAll(':scope > ul > li > input:not([type="hidden"])').forEach(x => x.addEventListener('change', this.handleInputChange));
-		e.querySelector(':scope > .add').addEventListener('click', this.handleAddClick);
+		this.selector().querySelector(':scope > [name="create"]')?.addEventListener('click', this.handleCreateClick);
+		this.controls?.forEach(x => x.listen());
 	}
 
 	refresh = async () => {
+		this.engine.stack.pop();
 		this.selector().outerHTML = await this.engine.render({ value: this });
 		this.listen();
 	}
 
-	handleInputChange = event => {
-		var t = event.currentTarget;
-		const p = t.parentElement;
-		const e = this.entries[[...p.parentElement.children].indexOf(p)];
-		var h = p.querySelector(':scope > input[type="hidden"]');
-		if (t.classList.contains('key')) {
-			e[0] = t.value;
-			h.name = `${this.name}.${t.value}`;
-		} else
-			h.value = e[1] = t.value;
-		this.binding.setter(Object.fromEntries(this.entries));
-	}
-
-	handleAddClick = async event => {
-		event.preventDefault();
-		if (!this.entries)
-			this.entries = [];
-		this.entries.push(['', '']);
-		this.binding.setter(Object.fromEntries(this.entries));
+	handleCreateClick = async () => {
+		this.reference.setValue({});
 		await this.refresh();
 	}
 }
 
-export default MapControl;
+export default LocaleControl;

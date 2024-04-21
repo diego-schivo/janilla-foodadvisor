@@ -1,0 +1,68 @@
+<div class="content">
+	<!--${list}-->
+	<!--${form}-->
+</div>
+
+<template id="Content-empty">
+	<div class="content"></div>
+</template>
+
+<template id="Content-List">
+	<table class="list">
+		<thead>
+			<tr>
+				<!--${headers}-->
+				<th>
+					<!--${createButton}-->
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<!--${rows}-->
+		</tbody>
+	</table>
+</template>
+
+<template id="Content-Header">
+	<th>${}</th>
+</template>
+
+<template id="Content-createButton">
+	<button type="button" class="create">Create</button>
+</template>
+
+<template id="Content-Row">
+	<tr>
+		<!--${cells}-->
+		<td>
+			<!--${editButton}-->
+			<!--${selectButton}-->
+		</td>
+	</tr>
+</template>
+
+<template id="Content-Cell">
+	<td>${}</td>
+</template>
+
+<template id="Content-editButton">
+	<button type="button" class="edit" name="id" value="${id}">Edit</button>
+</template>
+
+<template id="Content-selectButton">
+	<button type="button" class="select" name="id" value="${id}">Select</button>
+</template>
+
+<template id="Content-Form">
+	<form class="form">
+		<!--${control}-->
+		<ul class="buttons">
+			<li>
+				<button class="save">Save</button>
+			</li>
+			<li>
+				<button type="button" class="cancel">Cancel</button>
+			</li>
+		</ul>
+	</form>
+</template>

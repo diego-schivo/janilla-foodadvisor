@@ -23,26 +23,16 @@
  */
 package com.janilla.foodadvisor.api;
 
-import java.util.List;
-
-import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 import com.janilla.reflect.Order;
 
 @Store
-public class Page {
+public class Asset {
 
 	@Order(1)
 	public Long id;
 
+	@Reference(File.class)
 	@Order(2)
-	public String name;
-
-	@Index
-	@Order(3)
-	public String slug;
-
-	@Reference({ Hero.class, Features.class })
-	@Order(5)
-	public List<Object> components;
+	public Long file;
 }

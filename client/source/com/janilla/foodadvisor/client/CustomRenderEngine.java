@@ -23,31 +23,57 @@
  */
 package com.janilla.foodadvisor.client;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
 import java.util.Locale;
 import java.util.Map;
 
+import com.janilla.foodadvisor.api.Asset;
 import com.janilla.frontend.RenderEngine;
+import com.janilla.persistence.Persistence;
 
 public class CustomRenderEngine extends RenderEngine {
 
 	protected Locale locale;
 
+	protected Persistence persistence;
+
 	public void setLocale(Locale locale) {
 		this.locale = locale;
 	}
 
+	public void setPersistence(Persistence persistence) {
+		this.persistence = persistence;
+	}
+
 	@Override
 	protected Entry entryOf(Object key, Object value, AnnotatedType type) {
-		if (value instanceof Map<?, ?> m && type instanceof AnnotatedParameterizedType t) {
-			var aa = t.getAnnotatedActualTypeArguments();
-			if (aa.length == 2 && aa[0].getType() == Locale.class) {
-				var v = m.containsKey(locale) ? m.get(locale)
-						: !locale.equals(Locale.ENGLISH) ? m.get(Locale.ENGLISH) : null;
-				return super.entryOf(key, v, aa[1]);
+		if (value != null)
+			switch (value) {
+			case Map<?, ?> m:
+				if (type instanceof AnnotatedParameterizedType t) {
+					var aa = t.getAnnotatedActualTypeArguments();
+					if (aa.length == 2 && aa[0].getType() == Locale.class) {
+						value = m.containsKey(locale) ? m.get(locale)
+								: !locale.equals(Locale.ENGLISH) ? m.get(Locale.ENGLISH) : null;
+						type = aa[1];
+					}
+				}
+				break;
+//			case Long i:
+//				if (key.equals("image")) {
+//					try {
+//						value = persistence.getCrud(Asset.class).read(i);
+//					} catch (IOException e) {
+//						throw new UncheckedIOException(e);
+//					}
+//				}
+//				break;
+			default:
+				break;
 			}
-		}
 		return super.entryOf(key, value, type);
 	}
 }

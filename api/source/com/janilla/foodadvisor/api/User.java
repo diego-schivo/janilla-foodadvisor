@@ -31,47 +31,19 @@ import com.janilla.reflect.Order;
 public class User {
 
 	@Order(1)
-	private long id;
+	public Long id;
 
 	@Index
 	@Order(2)
-	private String email;
+	public String email;
 
 	@Order(3)
-	private String hash;
+	public String hash;
 
 	@Order(4)
-	private String salt;
+	public String salt;
 
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getHash() {
-		return hash;
-	}
-
-	public void setHash(String hash) {
-		this.hash = hash;
-	}
-
-	public String getSalt() {
-		return salt;
-	}
-
-	public void setSalt(String salt) {
-		this.salt = salt;
-	}
+	@Reference(Asset.class)
+	@Order(5)
+	public Long picture;
 }

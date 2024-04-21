@@ -10,24 +10,42 @@
 <body>
 </body>
 
-<template id="Admin-authenticated">
-	<div class="admin">
-		<select class="type">
-			<option></option>
-			<!--${types}-->
-		</select>
-		<!--${collection}-->
-	</div>
-</template>
-
 <template id="Admin-unauthenticated">
-	<div class="admin">
+	<div class="admin unauthenticated">
 		<!--${login}-->
 	</div>
 </template>
 
-<template id="Admin-Option">
+<template id="Admin-authenticated">
+	<div class="admin">
+		<div class="header">
+			<div>
+				<label>
+					Content Type
+					<select name="contentType">
+						<option></option>
+						<!--${contentTypes}-->
+					</select>
+				</label>
+			</div>
+			<div>
+				<label>Locales</label>
+				<!--${availableLocales}-->
+			</div>
+		</div>
+		<!--${content}-->
+	</div>
+</template>
+
+<template id="Admin-contentType">
 	<option>${}</option>
+</template>
+
+<template id="Admin-availableLocale">
+	<label>
+		<input type="checkbox" name="locale" value="${}" />
+		${}
+	</label>
 </template>
 
 </html>

@@ -1,0 +1,16 @@
+<div class="content-control control">
+	<input name="${name}" id="${name}" value="${value}" />
+	<button type="button" class="search">Search&hellip;</button>
+</div>
+
+<template id="ContentControl-unset">
+	<div class="content-control control">
+		<button type="button" class="create">Create</button>
+	</div>
+</template>
+
+<template id="ContentControl-searchDialog">
+	<dialog class="search-dialog">
+		${content}
+	</dialog>
+</template>

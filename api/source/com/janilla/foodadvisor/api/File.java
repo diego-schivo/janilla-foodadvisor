@@ -30,35 +30,11 @@ import com.janilla.reflect.Order;
 public class File {
 
 	@Order(1)
-	private long id;
+	public Long id;
 	
 	@Order(2)
-	private String name;
+	public String name;
 	
 	@Order(3)
-	private byte[] bytes;
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public byte[] getBytes() {
-		return bytes;
-	}
-
-	public void setBytes(byte[] bytes) {
-		this.bytes = bytes;
-	}
+	public byte[] bytes;
 }

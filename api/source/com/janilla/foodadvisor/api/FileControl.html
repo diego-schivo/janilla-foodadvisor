@@ -1,11 +1,10 @@
 <div class="file-control control">
 	<input name="${name}" id="${name}" value="${value}" />
-	<button>Choose...</button>
-	<!--${dialog}-->
+	<button type="button" class="upload">Upload&hellip;</button>
 </div>
 
-<template id="FileControl-Dialog">
-	<dialog>
+<template id="FileControl-uploadDialog">
+	<dialog class="upload-dialog">
 		<input type="file" name="file" />
 	</dialog>
 </template>

@@ -31,27 +31,11 @@ import com.janilla.reflect.Order;
 import com.janilla.web.Render;
 
 @Render(template = "Link.html")
-public class Link implements Component {
+public class Link { // implements Component {
 
 	@Order(1)
-	private URI uri;
+	public URI uri;
 
 	@Order(2)
-	private Map<Locale, String> text;
-
-	public URI getUri() {
-		return uri;
-	}
-
-	public void setUri(URI uri) {
-		this.uri = uri;
-	}
-
-	public Map<Locale, String> getText() {
-		return text;
-	}
-
-	public void setText(Map<Locale, String> text) {
-		this.text = text;
-	}
+	public Map<Locale, String> text;
 }

@@ -25,29 +25,26 @@ class TextControl {
 
 	selector;
 	
-	binding;
+	name;
 	
-	get value() {
-		return this.binding.getter();
-	}
+	reference;
 	
-	set value(x) {
-		this.binding.setter(x);
-	}
+	value;
 
 	render = async engine => {
 		return await engine.match([this], async (_, o) => {
+			this.value = this.reference.getValue();
 			o.template = 'TextControl';
 		});
 	}
 
 	listen = () => {
-		this.selector().querySelector('input').addEventListener('change', this.handleInputChange);
+		this.selector().querySelector(':scope > input').addEventListener('change', this.handleInputChange);
 	}
 	
 	handleInputChange = event => {
-		const i = event.currentTarget;
-		this.value = i.value;
+		this.value = event.currentTarget.value;
+		this.reference.setValue(this.value);
 	}
 }
 

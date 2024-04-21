@@ -1,7 +1,7 @@
 <div class="restaurant-details">
 	<div>
 		<div>
-			<img src="${images[0]}" alt="" />
+			<!--${images[0]}-->
 		</div>
 		<div>
 			<h2 class="category">${category}</h2>
@@ -9,8 +9,12 @@
 			<p class="description">${description}</p>
 		</div>
 	</div>
-	<img src="/files/${image}" alt="" />
 </div>
+
+<template id="Restaurant-image">
+	<img src="/files/${}" alt="" />
+</template>
+
 
 <template id="Restaurant-List">
 	<div class="restaurant-list">
