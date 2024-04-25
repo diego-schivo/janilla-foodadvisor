@@ -46,16 +46,19 @@ public class Restaurant {
 	public String slug;
 
 	@Order(4)
-	public List<@Render(template = "Restaurant-image.html") Long> images;
+	@Reference(Asset.class)
+	public List<@Render(template = "image.html") Long> images;
 
 	@Order(5)
 	public Map<Locale, String> description;
 
-	@Reference(Category.class)
+	@Index
 	@Order(6)
+	@Reference(Category.class)
 	public Long category;
 
-	@Reference(Place.class)
+	@Index
 	@Order(7)
+	@Reference(Place.class)
 	public Long place;
 }

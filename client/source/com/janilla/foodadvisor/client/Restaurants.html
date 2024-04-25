@@ -1,0 +1,43 @@
+<div class="restaurants">
+	<!--${header}-->
+	<div class="filters">
+		<form id="filters" action="/${slug}">
+			<select name="category">
+				<option value="">Category</option>
+				<!--${categories}-->
+			</select>
+			<select name="place">
+				<option value="">Place</option>
+				<!--${places}-->
+			</select>
+		</form>
+	</div>
+	<div class="cards">
+		<!--${items}-->
+	</div>
+	<div class="pages">
+		<!--${pages}-->
+	</div>
+</div>
+
+<template id="Restaurants-option">
+	<option value="${id}" data-${selected}>${name}</option>
+</template>
+
+<template id="Restaurants-button">
+	<button form="filters" name="page" value="${number}" data-${disabled}>${text}</button>
+</template>
+
+<template id="Restaurants-item">
+	<a href="/restaurants/${slug}">
+		<!--${images[0]}-->
+		<div>
+			<p class="place">${place.name}</p>
+			<p class="name">${name}</p>
+			<p class="description">${description}</p>
+			<div class="category-div">
+				<div class="category">#${category.name}</div>
+			</div>
+		</div>
+	</a>
+</template>

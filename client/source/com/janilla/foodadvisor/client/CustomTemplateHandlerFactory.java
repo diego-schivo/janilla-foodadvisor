@@ -65,7 +65,8 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 	@Override
 	protected RenderEngine newRenderEngine(HttpExchange exchange) {
 		var e = new CustomRenderEngine();
-		e.setLocale(((FoodAdvisorClientApp.Exchange) exchange).getLocale());
+		e.locale = ((FoodAdvisorClientApp.Exchange) exchange).getLocale();
+		e.persistence = persistence;
 		return e;
 	}
 }

@@ -21,44 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.client;
+package com.janilla.foodadvisor.api;
 
-import java.io.IOException;
-import java.nio.channels.WritableByteChannel;
+import com.janilla.persistence.Index;
+import com.janilla.persistence.Store;
+import com.janilla.reflect.Order;
 
-import com.janilla.foodadvisor.api.File;
-import com.janilla.http.HttpResponse;
-import com.janilla.http.HttpResponse.Status;
-import com.janilla.io.IO;
-import com.janilla.persistence.Persistence;
-import com.janilla.web.Handle;
-import com.janilla.web.NotFoundException;
+@Store
+public class Restaurants {
 
-public class FileWeb {
+	@Order(1)
+	public Long id;
 
-	Persistence persistence;
+	@Order(2)
+	public Header header;
 
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
-	}
-
-	@Handle(method = "GET", path = "/files/(\\d+)")
-	public void getFile(long id, HttpResponse response) throws IOException {
-		var f = persistence.getCrud(File.class).read(id);
-		if (f == null)
-			throw new NotFoundException();
-		response.setStatus(new Status(200, "OK"));
-		var n = f.name;
-		var e = n.substring(n.lastIndexOf('.') + 1);
-		var hh = response.getHeaders();
-		switch (e) {
-		case "png":
-			hh.set("Content-Type", "image/png");
-			break;
-		}
-		var bb = f.bytes;
-		hh.set("Content-Length", String.valueOf(bb.length));
-		var b = (WritableByteChannel) response.getBody();
-		IO.write(bb, b);
-	}
+	@Order(3)
+	@Index
+	public String slug;
 }

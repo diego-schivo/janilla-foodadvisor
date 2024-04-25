@@ -33,10 +33,12 @@ class ListControl {
 
 	reference;
 
-	types;
+	itemType;
+
+	referenceTypes;
 
 	engine;
-	
+
 	items;
 
 	control;
@@ -61,21 +63,21 @@ class ListControl {
 				label: l
 			};
 			o.template = 'ListControl-Item';
-			const c = Object.hasOwn(this.items[l], '$type') ? new ObjectControl() : (this.name.endsWith('images') ? new FileControl() : new TextControl());
+			// const c = Object.hasOwn(this.items[l], '$type') ? new ObjectControl() : (this.name.endsWith('images') ? new FileControl() : new TextControl());
+			const i = this.items[l];
+			const c = engine.admin.createControl(typeof(i) === 'object' && i !== null && Object.hasOwn(i, '$type') ? i.$type : this.itemType, undefined, this.referenceTypes);
 			c.selector = () => this.selector().querySelector(`:scope > ol > :nth-child(${1 + l}) > :last-child`);
 			c.name = n;
 			c.reference = {
 				getValue: () => this.items[l],
 				setValue: x => this.items[l] = x
 			};
-			if (this.types)
-				c.type = this.items[l].$type;
 			this.control = c;
 			this.controls.push(c);
 		})) || await engine.match(['dialog'], async (_, o) => {
-			if (this.types)
+			if (this.referenceTypes)
 				o.template = 'ListControl-Dialog';
-		}) || (this.types && await engine.match([this.types, 'number'], async (_, o) => {
+		}) || (this.referenceTypes && await engine.match([this.referenceTypes, 'number'], async (_, o) => {
 			o.template = 'ListControl-Option';
 		}));
 	}
@@ -93,12 +95,19 @@ class ListControl {
 
 	handleAddClick = async event => {
 		event.preventDefault();
-		if (this.types.length === 1) {
-			await this.add(/^[A-Z]/.test(this.types[0]) ? { '$type': this.types[0] } : '');
+		/*
+		if (this.referenceTypes.length === 1) {
+			await this.add(/^[A-Z]/.test(this.referenceTypes[0]) ? { '$type': this.referenceTypes[0] } : '');
 		} else {
 			const d = this.selector().querySelector(':scope > .dialog');
 			d.querySelector('.type').addEventListener('change', this.handleTypeChange);
 			d.showModal();
+		}
+		*/
+		switch (this.itemType) {
+			case 'long':
+				await this.add(null);
+				break;
 		}
 	}
 

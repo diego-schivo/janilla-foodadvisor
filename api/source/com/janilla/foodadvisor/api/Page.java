@@ -38,11 +38,11 @@ public class Page {
 	@Order(2)
 	public String name;
 
-	@Index
 	@Order(3)
+	@Index
 	public String slug;
 
-	@Reference({ Hero.class, Features.class })
 	@Order(5)
+	@Reference({ Features.class, Hero.class, Testimonial.class })
 	public List<Object> components;
 }

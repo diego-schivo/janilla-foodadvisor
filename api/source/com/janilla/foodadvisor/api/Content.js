@@ -53,6 +53,7 @@ class Content {
 			}
 			switch (this.type) {
 				case 'Global':
+				case 'Restaurants':
 					const s = await fetch(`/api/contents/${this.type}`, {
 						headers: engine.admin.apiHeaders
 					});

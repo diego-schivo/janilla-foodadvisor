@@ -21,12 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-import ContentControl from './ContentControl.js';
-import FileControl from './FileControl.js';
-import ListControl from './ListControl.js';
-import LocaleControl from './LocaleControl.js';
-import TextControl from './TextControl.js';
-
 class ObjectControl {
 
 	selector;
@@ -73,38 +67,7 @@ class ObjectControl {
 				label: f.name
 			};
 			o.template = 'ObjectControl-Field';
-			let c;
-			if (/^[A-Z]/.test(f.type)) {
-				c = new ObjectControl();
-				c.type = f.type;
-			}
-			else
-				switch (f.type) {
-					case 'list':
-						c = new ListControl();
-						c.types = f.referenceTypes ?? [f.typeArguments[0]];
-						break;
-					case 'long':
-						if (f.referenceTypes)
-							switch (f.referenceTypes[0]) {
-								case 'File':
-									c = new FileControl();
-									break;
-								default:
-									c = new ContentControl();
-									c.contentType = f.referenceTypes[0];
-									break;
-							}
-						else
-							c = new TextControl();
-						break;
-					case 'map':
-						c = new LocaleControl();
-						break;
-					default:
-						c = new TextControl();
-						break;
-				}
+			const c = engine.admin.createControl(f.type, f.typeArguments, f.referenceTypes);
 			c.selector = () => this.selector().querySelector(`label[for="${n}"] + *`);
 			c.reference = {
 				getValue: () => this.object[f.name],

@@ -39,15 +39,6 @@ public class Features {
 	@Order(2)
 	public List<@Render(template = "Features-card.html") Card> cards;
 
-	public static class Header {
-
-		@Order(1)
-		public Map<Locale, String> label;
-
-		@Order(2)
-		public Map<Locale, String> title;
-	}
-
 	public static class Card {
 
 		@Order(1)
@@ -56,8 +47,8 @@ public class Features {
 		@Order(2)
 		public Map<Locale, String> text;
 
-		@Reference(Asset.class)
 		@Order(3)
+		@Reference(Asset.class)
 		public @Render(template = "image.html") Long image;
 	}
 }

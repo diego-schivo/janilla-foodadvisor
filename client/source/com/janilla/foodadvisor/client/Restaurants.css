@@ -1,0 +1,101 @@
+.restaurants {
+	display: flex;
+	flex-direction: column;
+	gap: 6rem;
+	margin: 0 auto;
+	max-width: 1536px;
+	
+	.filters {
+		display: flex;
+		gap: .5rem;
+		padding: 0 1rem;
+	}
+
+	.cards {
+		display: grid;
+		gap: 4rem;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		padding: 0 1rem;
+	
+		> * {
+			border-radius: .5rem;
+			box-shadow: rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+				rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+				rgba(0, 0, 0, 0.1) 0px 10px 15px -3px,
+				rgba(0, 0, 0, 0.1) 0px 4px 6px -4px;
+			display: block;
+			overflow: hidden;
+	
+			> div {
+				padding: 1rem;
+			}
+		}
+	}
+	
+	img {
+		max-height: 12rem;
+		object-fit: cover;
+		width: 100%;
+	}
+	
+	.place {
+		color: rgb(65, 179, 163);
+	}
+	
+	.name {
+		font-size: 1.25rem;
+		margin: 0 0 .5rem;
+	}
+	
+	.description {
+		color: rgb(156, 163, 175);
+	}
+	
+	.category-div {
+		display: flex;
+		margin: 1rem 0 0;
+	}
+	
+	.category {
+		background: rgb(219, 234, 254);
+		border-radius: 1rem;
+		font-size: .75rem;
+		padding: .375rem 1rem;
+	}
+	
+	.pages {
+		display: flex;
+		margin: 0 auto;
+		width: calc(100% / 3);
+
+		button {
+			background: rgb(255, 255, 255);
+			border: 1px solid rgb(229, 231, 235);
+			color: rgb(75, 85, 99);
+			cursor: pointer;
+			flex: 0 0 50%;
+			font-size: inherit;
+			padding: 1rem;
+			
+			&:first-child {
+				border-bottom-left-radius: .75rem;
+				border-top-left-radius: .75rem;
+			}
+			
+			&:last-child {
+				border-bottom-right-radius: .75rem;
+				border-left-width: 0;
+				border-top-right-radius: .75rem;
+			}
+			
+			&:disabled {
+				cursor: not-allowed;
+				opacity: .5;
+			}
+			
+			&:hover {
+				background: rgb(243, 244, 246);
+			}
+		}
+	}
+}

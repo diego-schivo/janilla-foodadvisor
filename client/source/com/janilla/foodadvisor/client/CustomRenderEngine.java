@@ -23,30 +23,19 @@
  */
 package com.janilla.foodadvisor.client;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.lang.reflect.AnnotatedParameterizedType;
 import java.lang.reflect.AnnotatedType;
 import java.util.Locale;
 import java.util.Map;
 
-import com.janilla.foodadvisor.api.Asset;
 import com.janilla.frontend.RenderEngine;
 import com.janilla.persistence.Persistence;
 
 public class CustomRenderEngine extends RenderEngine {
 
-	protected Locale locale;
+	public Locale locale;
 
-	protected Persistence persistence;
-
-	public void setLocale(Locale locale) {
-		this.locale = locale;
-	}
-
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
-	}
+	public Persistence persistence;
 
 	@Override
 	protected Entry entryOf(Object key, Object value, AnnotatedType type) {
@@ -62,15 +51,6 @@ public class CustomRenderEngine extends RenderEngine {
 					}
 				}
 				break;
-//			case Long i:
-//				if (key.equals("image")) {
-//					try {
-//						value = persistence.getCrud(Asset.class).read(i);
-//					} catch (IOException e) {
-//						throw new UncheckedIOException(e);
-//					}
-//				}
-//				break;
 			default:
 				break;
 			}

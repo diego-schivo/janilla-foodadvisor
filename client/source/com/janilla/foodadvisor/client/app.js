@@ -22,11 +22,17 @@
  * SOFTWARE.
  */
 import LocalSwitch from './LocalSwitch.js';
+import Restaurants from './Restaurants.js';
 
 addEventListener('DOMContentLoaded', () => {
 	if (document.querySelector('.local-switch')) {
 		var s = new LocalSwitch();
 		s.selector = () => document.querySelector('.local-switch');
+		s.listen();
+	}
+	if (document.querySelector('.restaurants')) {
+		var s = new Restaurants();
+		s.selector = () => document.querySelector('.restaurants');
 		s.listen();
 	}
 });

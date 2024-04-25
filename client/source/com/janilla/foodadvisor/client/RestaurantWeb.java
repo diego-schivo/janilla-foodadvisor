@@ -24,7 +24,6 @@
 package com.janilla.foodadvisor.client;
 
 import java.io.IOException;
-import java.util.List;
 
 import com.janilla.foodadvisor.api.Restaurant;
 import com.janilla.persistence.Persistence;
@@ -37,14 +36,6 @@ public class RestaurantWeb {
 
 	public void setPersistence(Persistence persistence) {
 		this.persistence = persistence;
-	}
-
-	@Handle(method = "GET", path = "/restaurants")
-	public @Render(template = "Restaurant-List.html") List<com.janilla.foodadvisor.api.Restaurant> getList()
-			throws IOException {
-		var ii = persistence.getCrud(Restaurant.class).list();
-		var rr = persistence.getCrud(Restaurant.class).read(ii).toList();
-		return rr;
 	}
 
 	@Handle(method = "GET", path = "/restaurants/([a-z-]+)")

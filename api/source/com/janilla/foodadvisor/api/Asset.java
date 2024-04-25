@@ -32,7 +32,7 @@ public class Asset {
 	@Order(1)
 	public Long id;
 
-	@Reference(File.class)
 	@Order(2)
+	@Reference(File.class)
 	public Long file;
 }

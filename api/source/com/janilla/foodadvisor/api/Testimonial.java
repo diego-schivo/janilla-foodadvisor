@@ -21,44 +21,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.client;
+package com.janilla.foodadvisor.api;
 
 import java.io.IOException;
-import java.nio.channels.WritableByteChannel;
+import java.io.UncheckedIOException;
+import java.util.Locale;
+import java.util.Map;
 
-import com.janilla.foodadvisor.api.File;
-import com.janilla.http.HttpResponse;
-import com.janilla.http.HttpResponse.Status;
-import com.janilla.io.IO;
+import com.janilla.frontend.RenderEngine;
+import com.janilla.frontend.Renderer;
 import com.janilla.persistence.Persistence;
-import com.janilla.web.Handle;
-import com.janilla.web.NotFoundException;
+import com.janilla.reflect.Order;
+import com.janilla.reflect.Reflection;
+import com.janilla.web.Render;
 
-public class FileWeb {
+@Render(template = "Testimonial.html")
+public class Testimonial implements Renderer {
 
-	Persistence persistence;
+	@Order(1)
+	public Map<Locale, String> text;
 
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
-	}
+	@Order(2)
+	@Reference(User.class)
+	public @Render(template = "Testimonial-author.html") Long author;
 
-	@Handle(method = "GET", path = "/files/(\\d+)")
-	public void getFile(long id, HttpResponse response) throws IOException {
-		var f = persistence.getCrud(File.class).read(id);
-		if (f == null)
-			throw new NotFoundException();
-		response.setStatus(new Status(200, "OK"));
-		var n = f.name;
-		var e = n.substring(n.lastIndexOf('.') + 1);
-		var hh = response.getHeaders();
-		switch (e) {
-		case "png":
-			hh.set("Content-Type", "image/png");
-			break;
+	@Override
+	public boolean evaluate(RenderEngine engine) {
+		record A(Testimonial testimonial, Long author) {
 		}
-		var bb = f.bytes;
-		hh.set("Content-Length", String.valueOf(bb.length));
-		var b = (WritableByteChannel) response.getBody();
-		IO.write(bb, b);
+		return engine.match(A.class, (i, o) -> {
+			Persistence p;
+			try {
+				p = (Persistence) Reflection.property(engine.getClass(), "persistence").get(engine);
+			} catch (ReflectiveOperationException e) {
+				throw new RuntimeException(e);
+			}
+			User u;
+			try {
+				u = p.getCrud(User.class).read(i.author);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+			o.setValue(u);
+		});
 	}
 }

@@ -65,8 +65,8 @@ public class AdminWeb {
 		var u = i > 0 ? persistence.getCrud(User.class).read(i) : null;
 		{
 			var f = HexFormat.of();
-			var h = f.formatHex(CustomPersistenceBuilder.hash(credential.password.toCharArray(), f.parseHex(u.salt)));
-			if (!h.equals(u.hash))
+			var h = f.formatHex(CustomPersistenceBuilder.hash(credential.password.toCharArray(), f.parseHex(u.passwordSalt)));
+			if (!h.equals(u.passwordHash))
 				u = null;
 		}
 		var h = Map.of("alg", "HS256", "typ", "JWT");

@@ -1,6 +1,9 @@
 @import 'base.css';
 @import 'Features.css';
+@import 'Header.css';
 @import 'Hero.css';
 @import 'LocalSwitch.css';
 @import 'Navbar.css';
 @import 'Restaurant.css';
+@import 'Restaurants.css';
+@import 'Testimonial.css';

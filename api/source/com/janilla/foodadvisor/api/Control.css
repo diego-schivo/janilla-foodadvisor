@@ -11,6 +11,7 @@
 .list-control,
 .locale-control,
 .object-control {
+	align-items: start;
 	border-radius: .5rem;
 	display: flex;
 	flex-direction: column;

@@ -1,0 +1,54 @@
+.testimonial {
+	display: flex;
+	justify-content: center;
+
+	> * {
+		align-items: center;
+		background: rgb(75, 85, 99);
+		border-radius: 9999px;
+		display: flex;
+		flex: 0 0 75%;
+		flex-direction: column;
+		gap: 2rem;
+		padding: 5rem;
+	}
+	
+	.author {
+		align-items: center;
+		color: rgb(156, 163, 175);
+		display: flex;
+		font-size: 1.25rem;
+		line-height: 1.75rem;
+		gap: .5rem;
+	}
+	
+	p {
+		color: rgb(255, 255, 255);
+		font-size: 1.875rem;
+		line-height: 2.25rem;
+		text-align: center;
+		width: 66.6667%;
+		
+		&::after,
+		&::before {
+			color: rgb(226, 125, 96);
+			content: '“';
+			font-weight: 700;
+		}
+	}
+	
+	img {
+		border-radius: 9999px;
+		height: 2.5rem;
+		object-fit: cover;
+		width: 2.5rem;
+	}
+	
+	span {
+		&:first-of-type {
+			color: rgb(226, 125, 96);
+			font-size: 1.125rem;
+			font-weight: 600;
+		}
+	}
+}

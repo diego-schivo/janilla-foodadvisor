@@ -87,8 +87,8 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 		random.nextBytes(s);
 		var h = hash(p, s);
 		var f = HexFormat.of();
-		user.hash = f.formatHex(h);
-		user.salt = f.formatHex(s);
+		user.passwordHash = f.formatHex(h);
+		user.passwordSalt = f.formatHex(s);
 	}
 
 	static byte[] hash(char[] password, byte[] salt) {

@@ -22,8 +22,14 @@
  * SOFTWARE.
  */
 import Content from './Content.js';
+import ContentControl from './ContentControl.js';
+import FileControl from './FileControl.js';
+import ListControl from './ListControl.js';
+import LocaleControl from './LocaleControl.js';
 import Login from './Login.js';
+import ObjectControl from './ObjectControl.js';
 import RenderEngine from './RenderEngine.js';
+import TextControl from './TextControl.js';
 
 class Admin {
 
@@ -110,6 +116,43 @@ class Admin {
 	handleLocaleChange = () => {
 		this.locales = [...this.selector().querySelectorAll(':scope > .header [name="locale"]:checked')].map(x => x.value);
 		this.content.refresh();
+	}
+
+	createControl = (type, typeArguments, referenceTypes) => {
+		let c;
+		if (/^[A-Z]/.test(type)) {
+			c = new ObjectControl();
+			c.type = type;
+		}
+		else
+			switch (type) {
+				case 'list':
+					c = new ListControl();
+					c.itemType = typeArguments[0];
+					c.referenceTypes = referenceTypes;
+					break;
+				case 'long':
+					if (referenceTypes)
+						switch (referenceTypes[0]) {
+							case 'File':
+								c = new FileControl();
+								break;
+							default:
+								c = new ContentControl();
+								c.contentType = referenceTypes[0];
+								break;
+						}
+					else
+						c = new TextControl();
+					break;
+				case 'map':
+					c = new LocaleControl();
+					break;
+				default:
+					c = new TextControl();
+					break;
+			}
+		return c;
 	}
 }
 

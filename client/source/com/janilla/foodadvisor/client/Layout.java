@@ -48,6 +48,8 @@ public record Layout(Persistence persistence, Locale locale, Global global, Rend
 		}
 		record B(Long id, Object file) {
 		}
+//		record C(Testimonial testimonial, Long author) {
+//		}
 		return engine.match(A.class, (i, o) -> {
 			o.setValue(entry.getValue());
 			o.setType(entry.getType());
@@ -59,6 +61,14 @@ public record Layout(Persistence persistence, Locale locale, Global global, Rend
 				throw new UncheckedIOException(e);
 			}
 			o.setValue(a.file);
+//		}) || engine.match(C.class, (i, o) -> {
+//			User u;
+//			try {
+//				u = persistence.getCrud(User.class).read(i.author);
+//			} catch (IOException e) {
+//				throw new UncheckedIOException(e);
+//			}
+//			o.setValue(u);
 		});
 	}
 }
