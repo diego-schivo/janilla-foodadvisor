@@ -1,16 +1,45 @@
-<div class="restaurant-details">
+<div class="restaurant">
+	<a href="/restaurants">
+		<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16l-4-4m0 0l4-4m-4 4h18"></path>
+		</svg>
+	</a>
 	<div>
 		<div>
 			<!--${images[0]}-->
 		</div>
 		<div>
-			<h2 class="category">${category}</h2>
+			<h2 class="category">${category.name}</h2>
 			<h1 class="name">${name}</h1>
+			<div class="stars-parent">
+				<span class="stars">
+					<!--${stars}-->
+				</span>
+				<span class="review-summary">${reviewSummary}</span>
+				<span class="price">${price}</span>
+			</div>
 			<p class="description">${description}</p>
 		</div>
+	</div>
+	<div>
+		<!--${reviews}-->
 	</div>
 </div>
 
 <template id="Restaurant-image">
 	<img src="/files/${}" alt="" />
+</template>
+
+<template id="Restaurant-star">
+	<svg fill="${fill}" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+		<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+	</svg>
+</template>
+
+<template id="Restaurant-review">
+	<div>
+		<p>${content}</p>
+		<p>${note}</p>
+		<p>${author.username}</p>
+	</div>
 </template>

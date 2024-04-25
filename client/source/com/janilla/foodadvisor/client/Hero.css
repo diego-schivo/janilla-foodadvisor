@@ -29,7 +29,7 @@
 				grid-area: c;
 			}
 			
-			> :last-child {
+			> :nth-child(4) {
 				grid-area: d;
 			}
 		}
@@ -73,7 +73,7 @@
 			color: white;
 		}
 		
-		&:last-child {
+		> :nth-child(2) {
 			background: rgb(229, 231, 235);
 			margin-left: .5rem;
 		}

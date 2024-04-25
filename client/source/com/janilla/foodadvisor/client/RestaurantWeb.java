@@ -24,24 +24,69 @@
 package com.janilla.foodadvisor.client;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import com.janilla.foodadvisor.api.Category;
+import com.janilla.foodadvisor.api.Place;
 import com.janilla.foodadvisor.api.Restaurant;
-import com.janilla.persistence.Persistence;
+import com.janilla.foodadvisor.api.Review;
+import com.janilla.foodadvisor.api.User;
+import com.janilla.frontend.RenderEngine;
+import com.janilla.frontend.Renderer;
+import com.janilla.reflect.Flatten;
 import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
 public class RestaurantWeb {
 
-	Persistence persistence;
+	CustomPersistence persistence;
 
-	public void setPersistence(Persistence persistence) {
+	public void setPersistence(CustomPersistence persistence) {
 		this.persistence = persistence;
 	}
 
 	@Handle(method = "GET", path = "/restaurants/([a-z-]+)")
-	public @Render(template = "Restaurant.html") Restaurant getDetails(String slug) throws IOException {
-		var ii = persistence.getCrud(Restaurant.class).filter("slug", slug);
-		var r = persistence.getCrud(Restaurant.class).read(ii[0]);
-		return r;
+	public Restaurant2 getRestaurant(String slug) throws IOException {
+		var i = persistence.getCrud(Restaurant.class).find("slug", slug);
+		var r = persistence.getCrud(Restaurant.class).read(i);
+		var cc = persistence.getCategories();
+		var pp = persistence.getPlaces();
+		var ii = persistence.getCrud(Review.class).filter("restaurant", r.id);
+		var rr = persistence.getCrud(Review.class).read(ii).toList();
+		return new Restaurant2(r, cc.get(r.category), IntStream.rangeClosed(1, 5).boxed().toList(),
+				rr.stream().mapToInt(x -> x.note).average().orElse(0),
+				rr.size() == 1 ? "1 Review" : rr.size() + " Reviews",
+				IntStream.range(0, r.price).mapToObj(x -> "€").collect(Collectors.joining(" ")), pp.get(r.place),
+				rr.stream().map(x -> {
+					User a;
+					try {
+						a = persistence.getCrud(User.class).read(x.author);
+					} catch (IOException e) {
+						throw new UncheckedIOException(e);
+					}
+					return new Review2(x, a);
+				}).toList());
+	}
+
+	@Render(template = "Restaurant.html")
+	public record Restaurant2(@Flatten Restaurant restaurant, Category category,
+			List<@Render(template = "Restaurant-star.html") Integer> stars, double average, String reviewSummary,
+			String price, Place place, List<Review2> reviews) implements Renderer {
+
+		@Override
+		public boolean evaluate(RenderEngine engine) {
+			record A(Integer note, Object fill) {
+			}
+			return engine.match(A.class, (i, o) -> {
+				o.setValue(i.note <= average ? "currentColor" : "none");
+			});
+		}
+	}
+
+	@Render(template = "Restaurant-review.html")
+	public record Review2(@Flatten Review review, User author) {
 	}
 }

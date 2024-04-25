@@ -47,6 +47,7 @@ public class FoodAdvisorClientApp {
 			}
 			a.setConfiguration(c);
 		}
+		a.getPersistence();
 
 		var s = a.new Server();
 		s.setPort(Integer.parseInt(a.getConfiguration().getProperty("foodadvisor.client.server.port")));

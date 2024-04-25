@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.janilla.foodadvisor.api.Category;
 import com.janilla.foodadvisor.api.Place;
@@ -35,7 +34,6 @@ import com.janilla.foodadvisor.api.Restaurant;
 import com.janilla.foodadvisor.api.Restaurants;
 import com.janilla.frontend.RenderEngine;
 import com.janilla.frontend.Renderer;
-import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Flatten;
 import com.janilla.reflect.Parameter;
 import com.janilla.web.Handle;
@@ -43,11 +41,11 @@ import com.janilla.web.Render;
 
 public class RestaurantsWeb {
 
-	public static int PAGE_SIZE = 1;
+	public static int PAGE_SIZE = 6;
 
-	Persistence persistence;
+	CustomPersistence persistence;
 
-	public void setPersistence(Persistence persistence) {
+	public void setPersistence(CustomPersistence persistence) {
 		this.persistence = persistence;
 	}
 
@@ -62,24 +60,12 @@ public class RestaurantsWeb {
 						Map.of("category", category != null ? new Object[] { category } : new Object[0], "place",
 								place != null ? new Object[] { place } : new Object[0]),
 						(n - 1) * PAGE_SIZE, PAGE_SIZE);
-		var cc = getCategories();
-		var pp = getPlaces();
+		var cc = persistence.getCategories();
+		var pp = persistence.getPlaces();
 		var rr = persistence.getCrud(Restaurant.class).read(p.ids())
 				.map(r -> new Restaurant2(r, cc.get(r.category), pp.get(r.place))).toList();
 		return new Restaurants2(s, cc.values(), category, pp.values(), place, rr, n,
 				(int) Math.ceilDiv(p.total(), PAGE_SIZE));
-	}
-
-	protected Map<Long, Category> getCategories() throws IOException {
-		var c = persistence.getCrud(Category.class);
-		var s = c.read(c.list());
-		return s.collect(Collectors.toMap(x -> x.id, x -> x));
-	}
-
-	protected Map<Long, Place> getPlaces() throws IOException {
-		var c = persistence.getCrud(Place.class);
-		var s = c.read(c.list());
-		return s.collect(Collectors.toMap(x -> x.id, x -> x));
 	}
 
 	@Render(template = "Restaurants.html")

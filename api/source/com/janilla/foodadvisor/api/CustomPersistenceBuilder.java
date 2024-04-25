@@ -24,13 +24,23 @@
 package com.janilla.foodadvisor.api;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.HexFormat;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.crypto.SecretKeyFactory;
@@ -39,8 +49,21 @@ import javax.crypto.spec.PBEKeySpec;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Reflection;
+import com.janilla.util.Randomize;
+import com.janilla.util.Util;
 
 public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
+
+	static Pattern nonWord = Pattern.compile("[^\\p{L}]+", Pattern.UNICODE_CHARACTER_CLASS);
+
+	static Set<String> safeWords = nonWord.splitAsStream(
+			"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+					+ " Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+					+ " Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+					+ " Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
+			.map(String::toLowerCase).sorted().collect(Collectors.toCollection(LinkedHashSet::new));
+
+	static List<String> w = new ArrayList<>(safeWords);
 
 	@Override
 	public Persistence build() throws IOException {
@@ -66,10 +89,95 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 			}
 		});
 		if (!e) {
-			var u = new User();
-			u.email = "admin@example.com";
-			setHashAndSalt(u, "Password1!");
-			p.getCrud(User.class).create(u);
+			{
+				var u = new User();
+				u.email = "admin@example.com";
+				setHashAndSalt(u, "Password1!");
+				p.getCrud(User.class).create(u);
+			}
+
+			for (var n : Randomize.elements(10, 15, w).distinct().toList()) {
+				var o = Randomize.element(w);
+				var u = new User();
+				u.username = Util.capitalizeFirstChar(n) + " " + Util.capitalizeFirstChar(o);
+				u.email = n + "@" + o + ".com";
+				setHashAndSalt(u, n);
+				p.getCrud(User.class).create(u);
+			}
+
+			{
+				var g = new Global();
+				var n = new Global.Navigation();
+				var l = new Link();
+				l.uri = URI.create("/");
+				l.text = Map.of(Locale.ENGLISH, "FoodAdvisor");
+				n.leftButton = l;
+				g.navigation = n;
+				p.getCrud(Global.class).create(g);
+			}
+
+			{
+				var q = new Page();
+				q.slug = "";
+				var h = new Hero();
+				h.title = Map.of(Locale.ENGLISH, "Welcome to FoodAdvisor 🍕");
+				var l = new Link();
+				l.uri = URI.create("/restaurants");
+				l.text = Map.of(Locale.ENGLISH, "Browse restaurants");
+				h.buttons = List.of(l);
+				q.components = List.of(h);
+				p.getCrud(Page.class).create(q);
+			}
+
+			{
+				var s = new Restaurants();
+				s.slug = "restaurants";
+				p.getCrud(Restaurants.class).create(s);
+			}
+
+			{
+				var a = new Asset();
+				var f = new File();
+				f.name = Randomize.phrase(2, 4, () -> Randomize.element(w)).replace(' ', '-') + ".jpg";
+				f.bytes = foo();
+				p.getCrud(File.class).create(f);
+				a.file = f.id;
+				p.getCrud(Asset.class).create(a);
+			}
+
+			for (var n : Randomize.elements(5, 15, w).distinct().map(Util::capitalizeFirstChar).toList()) {
+				var c = new Category();
+				c.name = n;
+				p.getCrud(Category.class).create(c);
+			}
+
+			for (var n : Randomize.elements(5, 15, w).distinct().map(Util::capitalizeFirstChar).toList()) {
+				var q = new Place();
+				q.name = n;
+				p.getCrud(Place.class).create(q);
+			}
+
+			var r = ThreadLocalRandom.current();
+			for (var i = r.nextInt(1, 2); i > 0; i--) {
+				var s = new Restaurant();
+				s.name = Util.capitalizeFirstChar(Randomize.phrase(2, 4, () -> Randomize.element(w)));
+				s.slug = s.name.toLowerCase().replace(' ', '-');
+				s.images = List.of(r.nextLong(1, p.getCrud(Asset.class).count() + 1));
+				s.price = r.nextInt(1, 5);
+				s.description = Map.of(Locale.ENGLISH, Randomize.sentence(20, 30, () -> Randomize.element(w)));
+				s.category = r.nextLong(1, p.getCrud(Category.class).count() + 1);
+				s.place = r.nextLong(1, p.getCrud(Place.class).count() + 1);
+				p.getCrud(Restaurant.class).create(s);
+			}
+
+			for (var i = r.nextInt(3, 6); i > 0; i--) {
+				var s = new Review();
+				s.content = Randomize.sentence(20, 30, () -> Randomize.element(w));
+				s.note = r.nextInt(1, 6);
+				s.author = r.nextLong(2, p.getCrud(User.class).count() + 1);
+				s.restaurant = r.nextLong(1, p.getCrud(Restaurant.class).count() + 1);
+				p.getCrud(Review.class).create(s);
+			}
 		}
 		return p;
 	}
@@ -98,6 +206,42 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 			return f.generateSecret(s).getEncoded();
 		} catch (GeneralSecurityException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	static byte[] foo() throws IOException {
+//		try (var c = new HttpClient()) {
+//			c.setAddress(new InetSocketAddress("www.janilla.com", 443));
+////			c.setAddress(new InetSocketAddress("source.unsplash.com", 443));
+//			var k = Path.of(System.getProperty("user.home")).resolve("Downloads/jssesamples/samples/sslengine/testkeys");
+//			var x = Net.getSSLContext(k, "passphrase".toCharArray());
+//			c.setSSLContext(x);
+//			
+////			c.setAddress(new InetSocketAddress("source.unsplash.com", 443));
+//			c.query(h -> {
+////				try (var q = h.getRequest()) {
+//				var q = h.getRequest();
+//				q.setMethod(new HttpRequest.Method("GET"));
+//				q.setURI(URI.create("/youtube_social_icon_red.png"));
+////				q.setURI(URI.create("/random/?Food"));
+//				q.getHeaders().add("Host", "www.janilla.com");
+////				q.getHeaders().add("Host", "source.unsplash.com");
+//				q.getHeaders().add("User-Agent", "curl/8.2.1");
+//				q.getHeaders().add("Accept", "*/*");
+//				q.close();
+////				q.getHeaders().add("Connection", "close");
+////				}
+////				try (var s = h.getResponse()) {
+//				var s = h.getResponse();
+//				var t = s.getStatus();
+//				System.out.println("t=" + t);
+//				Channels.newInputStream((ReadableByteChannel) s.getBody()).readAllBytes();
+////				}
+//			});
+//		}
+		try (var s = URI.create("https://source.unsplash.com/random/?Food").toURL().openStream()) {
+//		    Files.copy(in, Paths.get("C:/File/To/Save/To/image.jpg"));
+			return s.readAllBytes();
 		}
 	}
 }

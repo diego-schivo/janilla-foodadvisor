@@ -48,17 +48,20 @@ public class Restaurant {
 	@Order(4)
 	@Reference(Asset.class)
 	public List<@Render(template = "image.html") Long> images;
-
+	
 	@Order(5)
+	public Integer price;
+
+	@Order(6)
 	public Map<Locale, String> description;
 
 	@Index
-	@Order(6)
+	@Order(7)
 	@Reference(Category.class)
 	public Long category;
 
 	@Index
-	@Order(7)
+	@Order(8)
 	@Reference(Place.class)
 	public Long place;
 }
