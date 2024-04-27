@@ -24,11 +24,13 @@
 package com.janilla.foodadvisor.api;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HexFormat;
 import java.util.LinkedHashSet;
@@ -41,6 +43,7 @@ import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import javax.crypto.SecretKeyFactory;
@@ -102,6 +105,15 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				u.username = Util.capitalizeFirstChar(n) + " " + Util.capitalizeFirstChar(o);
 				u.email = n + "@" + o + ".com";
 				setHashAndSalt(u, n);
+
+				var a = new Asset();
+				var f = new File();
+				f.name = Randomize.phrase(2, 4, () -> Randomize.element(w)).replace(' ', '-') + ".jpg";
+				f.bytes = downloadImage("150x150", "avatar");
+				p.getCrud(File.class).create(f);
+				a.file = f.id;
+				p.getCrud(Asset.class).create(a);
+				u.picture = a.id;
 				p.getCrud(User.class).create(u);
 			}
 
@@ -135,16 +147,6 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				p.getCrud(Restaurants.class).create(s);
 			}
 
-			{
-				var a = new Asset();
-				var f = new File();
-				f.name = Randomize.phrase(2, 4, () -> Randomize.element(w)).replace(' ', '-') + ".jpg";
-				f.bytes = foo();
-				p.getCrud(File.class).create(f);
-				a.file = f.id;
-				p.getCrud(Asset.class).create(a);
-			}
-
 			for (var n : Randomize.elements(5, 15, w).distinct().map(Util::capitalizeFirstChar).toList()) {
 				var c = new Category();
 				c.name = n;
@@ -162,9 +164,24 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				var s = new Restaurant();
 				s.name = Util.capitalizeFirstChar(Randomize.phrase(2, 4, () -> Randomize.element(w)));
 				s.slug = s.name.toLowerCase().replace(' ', '-');
-				s.images = List.of(r.nextLong(1, p.getCrud(Asset.class).count() + 1));
+
+				s.images = IntStream.range(0, r.nextInt(3, 7)).mapToLong(x -> {
+					try {
+						var a = new Asset();
+						var f = new File();
+						f.name = Randomize.phrase(2, 4, () -> Randomize.element(w)).replace(' ', '-') + ".jpg";
+						f.bytes = downloadImage("1600x900", "food");
+						p.getCrud(File.class).create(f);
+						a.file = f.id;
+						p.getCrud(Asset.class).create(a);
+						return a.id;
+					} catch (IOException f) {
+						throw new UncheckedIOException(f);
+					}
+				}).boxed().toList();
 				s.price = r.nextInt(1, 5);
-				s.description = Map.of(Locale.ENGLISH, Randomize.sentence(20, 30, () -> Randomize.element(w)));
+				var d = Map.of(Locale.ENGLISH, Randomize.sentence(20, 30, () -> Randomize.element(w)));
+				s.information = new Restaurant.Information(d, null, null);
 				s.category = r.nextLong(1, p.getCrud(Category.class).count() + 1);
 				s.place = r.nextLong(1, p.getCrud(Place.class).count() + 1);
 				p.getCrud(Restaurant.class).create(s);
@@ -172,6 +189,7 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
 			for (var i = r.nextInt(3, 6); i > 0; i--) {
 				var s = new Review();
+				s.creationTime = Randomize.instant(Instant.parse("2020-01-01T00:00:00.00Z"), Instant.now());
 				s.content = Randomize.sentence(20, 30, () -> Randomize.element(w));
 				s.note = r.nextInt(1, 6);
 				s.author = r.nextLong(2, p.getCrud(User.class).count() + 1);
@@ -209,7 +227,7 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 		}
 	}
 
-	static byte[] foo() throws IOException {
+	static byte[] downloadImage(String size, String term) throws IOException {
 //		try (var c = new HttpClient()) {
 //			c.setAddress(new InetSocketAddress("www.janilla.com", 443));
 ////			c.setAddress(new InetSocketAddress("source.unsplash.com", 443));
@@ -239,7 +257,7 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 ////				}
 //			});
 //		}
-		try (var s = URI.create("https://source.unsplash.com/random/?Food").toURL().openStream()) {
+		try (var s = URI.create("https://source.unsplash.com/" + size + "?" + term).toURL().openStream()) {
 //		    Files.copy(in, Paths.get("C:/File/To/Save/To/image.jpg"));
 			return s.readAllBytes();
 		}

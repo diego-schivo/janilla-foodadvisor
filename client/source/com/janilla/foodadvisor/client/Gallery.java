@@ -23,41 +23,11 @@
  */
 package com.janilla.foodadvisor.client;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.Locale;
+import java.util.List;
 
 import com.janilla.foodadvisor.api.Asset;
-import com.janilla.foodadvisor.api.Global;
-import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
-import com.janilla.persistence.Persistence;
 import com.janilla.web.Render;
 
-@Render(template = "Layout.html")
-public record Layout(Persistence persistence, Locale locale, Global global, RenderEngine.Entry entry)
-		implements Renderer {
-
-	public Navbar navbar() {
-		return new Navbar(global != null ? global.navigation : null);
-	}
-
-	@Override
-	public boolean evaluate(RenderEngine engine) {
-		record A(Layout layout, Object content) {
-		}
-		record B(Long id, Object file) {
-		}
-		return engine.match(A.class, (i, o) -> {
-			o.setValue(entry.getValue());
-			o.setType(entry.getType());
-		}) || engine.match(B.class, (i, o) -> {
-			Asset a;
-			try {
-				a = persistence.getCrud(Asset.class).read(i.id);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
-		});
-	}
+@Render(template = "Gallery.html")
+public record Gallery(List<@Render(template = "Gallery-image.html") Asset> images) {
 }

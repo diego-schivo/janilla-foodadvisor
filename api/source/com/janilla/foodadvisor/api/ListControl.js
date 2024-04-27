@@ -108,6 +108,9 @@ class ListControl {
 			case 'long':
 				await this.add(null);
 				break;
+			default:
+				await this.add({ '$type': this.itemType });
+				break;
 		}
 	}
 

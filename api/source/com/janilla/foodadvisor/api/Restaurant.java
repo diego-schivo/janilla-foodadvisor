@@ -26,6 +26,7 @@ package com.janilla.foodadvisor.api;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
@@ -48,12 +49,12 @@ public class Restaurant {
 	@Order(4)
 	@Reference(Asset.class)
 	public List<@Render(template = "image.html") Long> images;
-	
+
 	@Order(5)
 	public Integer price;
 
 	@Order(6)
-	public Map<Locale, String> description;
+	public Information information;
 
 	@Index
 	@Order(7)
@@ -64,4 +65,21 @@ public class Restaurant {
 	@Order(8)
 	@Reference(Place.class)
 	public Long place;
+
+	@Render(template = "Restaurant-Information.html")
+	public record Information(Map<Locale, String> description,
+			@Render(template = "Restaurant-openingHours.html") List<OpeningHour> openingHours, Location location) {
+	}
+
+	@Render(template = "Restaurant-OpeningHour.html")
+	public record OpeningHour(String dayInterval, String openingHour, String closingHour) {
+	}
+
+	@Render(template = "Restaurant-Location.html")
+	public record Location(String address, String website, String phone) {
+
+		public List<@Render(template = "Restaurant-Location-item.html") String> items() {
+			return Stream.of(address, website, phone).filter(x -> x != null).toList();
+		}
+	}
 }

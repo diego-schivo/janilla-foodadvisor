@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+import Gallery from './Gallery.js';
 import LocalSwitch from './LocalSwitch.js';
 import Restaurants from './Restaurants.js';
 
@@ -34,5 +35,10 @@ addEventListener('DOMContentLoaded', () => {
 		var s = new Restaurants();
 		s.selector = () => document.querySelector('.restaurants');
 		s.listen();
+	}
+	if (document.querySelector('.gallery')) {
+		var g = new Gallery();
+		g.selector = () => document.querySelector('.gallery');
+		g.listen();
 	}
 });

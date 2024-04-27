@@ -25,12 +25,16 @@ package com.janilla.foodadvisor.client;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.text.DecimalFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import com.janilla.foodadvisor.api.Asset;
 import com.janilla.foodadvisor.api.Category;
-import com.janilla.foodadvisor.api.Place;
 import com.janilla.foodadvisor.api.Restaurant;
 import com.janilla.foodadvisor.api.Review;
 import com.janilla.foodadvisor.api.User;
@@ -41,6 +45,8 @@ import com.janilla.web.Handle;
 import com.janilla.web.Render;
 
 public class RestaurantWeb {
+
+	private static DecimalFormat noteFormatter = new DecimalFormat("0.#");
 
 	CustomPersistence persistence;
 
@@ -53,28 +59,79 @@ public class RestaurantWeb {
 		var i = persistence.getCrud(Restaurant.class).find("slug", slug);
 		var r = persistence.getCrud(Restaurant.class).read(i);
 		var cc = persistence.getCategories();
-		var pp = persistence.getPlaces();
-		var ii = persistence.getCrud(Review.class).filter("restaurant", r.id);
-		var rr = persistence.getCrud(Review.class).read(ii).toList();
-		return new Restaurant2(r, cc.get(r.category), IntStream.rangeClosed(1, 5).boxed().toList(),
-				rr.stream().mapToInt(x -> x.note).average().orElse(0),
-				rr.size() == 1 ? "1 Review" : rr.size() + " Reviews",
-				IntStream.range(0, r.price).mapToObj(x -> "€").collect(Collectors.joining(" ")), pp.get(r.place),
-				rr.stream().map(x -> {
-					User a;
-					try {
-						a = persistence.getCrud(User.class).read(x.author);
-					} catch (IOException e) {
-						throw new UncheckedIOException(e);
+		List<Review> rr;
+		{
+			var ii = persistence.getCrud(Review.class).filter("restaurant", r.id);
+			rr = persistence.getCrud(Review.class).read(ii).toList();
+		}
+		var g = new Gallery(r.images.stream().map(x -> {
+			try {
+				return persistence.getCrud(Asset.class).read(x);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}).toList());
+		var c = cc.get(r.category);
+		var s = rr.size() == 1 ? "1 Review" : rr.size() + " Reviews";
+		var p = IntStream.range(0, r.price).mapToObj(x -> "€").collect(Collectors.joining(" "));
+		var a = rr.stream().mapToInt(x -> x.note).average().orElse(0);
+		var qq = rr.stream().map(x -> {
+			try {
+				var u = persistence.getCrud(User.class).read(x.author);
+				var d = Duration.between(x.creationTime, Instant.now());
+				var l = d.toDaysPart();
+				String t;
+				if (l > 0)
+					t = l + " days ago";
+				else {
+					l = d.toHoursPart();
+					if (l > 0)
+						t = l + " hours ago";
+					else {
+						l = d.toMinutesPart();
+						if (l > 0)
+							t = l + " minutes ago";
+						else {
+							l = d.toSecondsPart();
+							t = l + " seconds ago";
+						}
 					}
-					return new Review2(x, a);
-				}).toList());
+				}
+				var q = persistence.getCrud(Asset.class).read(u.picture);
+				return new Review2(x, new User2(u, q), t);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		}).toList();
+		List<Map.Entry<String, Integer>> nn;
+		{
+			var kk = new String[] { "Excellent", "Good", "Average", "Bellow Average", "Poor" };
+			var vv = new int[5];
+			for (var x : rr)
+				vv[5 - x.note]++;
+
+			nn = IntStream.range(0, kk.length).mapToObj(x -> Map.entry(kk[x], vv[x])).toList();
+		}
+		return new Restaurant2(r, g, c, s, p, a, nn, qq);
 	}
 
 	@Render(template = "Restaurant.html")
-	public record Restaurant2(@Flatten Restaurant restaurant, Category category,
-			List<@Render(template = "Restaurant-star.html") Integer> stars, double average, String reviewSummary,
-			String price, Place place, List<Review2> reviews) implements Renderer {
+	public record Restaurant2(@Flatten Restaurant restaurant, Gallery gallery, Category category, String reviewSummary,
+			String price, double average,
+			List<Map.@Render(template = "Restaurant-note.html") Entry<String, Integer>> notes,
+			@Render(template = "Restaurant-reviews.html") List<Review2> reviews) implements Renderer {
+
+		public String className() {
+			return "restaurant";
+		}
+
+		public List<@Render(template = "Restaurant-star.html") Integer> stars() {
+			return IntStream.rangeClosed(1, 5).boxed().toList();
+		}
+
+		public String averageSummary() {
+			return noteFormatter.format(average) + "/5";
+		}
 
 		@Override
 		public boolean evaluate(RenderEngine engine) {
@@ -87,6 +144,22 @@ public class RestaurantWeb {
 	}
 
 	@Render(template = "Restaurant-review.html")
-	public record Review2(@Flatten Review review, User author) {
+	public record Review2(@Flatten Review review, User2 author, String timeSummary) implements Renderer {
+
+		public List<@Render(template = "Restaurant-star.html") Integer> stars() {
+			return IntStream.rangeClosed(1, 5).boxed().toList();
+		}
+
+		@Override
+		public boolean evaluate(RenderEngine engine) {
+			record A(Integer note, Object fill) {
+			}
+			return engine.match(A.class, (i, o) -> {
+				o.setValue(i.note <= review.note ? "currentColor" : "none");
+			});
+		}
+	}
+
+	public record User2(@Flatten User user, @Render(template = "image.html") Asset picture) {
 	}
 }

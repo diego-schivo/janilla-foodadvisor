@@ -29,7 +29,6 @@ import java.util.Map;
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
 import com.janilla.reflect.Order;
-import com.janilla.web.Render;
 
 @Store
 public class User {
@@ -52,7 +51,7 @@ public class User {
 
 	@Order(6)
 	@Reference(Asset.class)
-	public @Render(template = "image.html") Long picture;
+	public Long picture;
 
 	@Order(7)
 	public Map<Locale, String> job;

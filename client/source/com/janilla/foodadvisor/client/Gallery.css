@@ -1,0 +1,74 @@
+@font-face {
+	font-family: 'revicons';
+	src: url('/revicons.woff') format('woff');
+}
+
+.gallery {
+	align-items: center;
+	display: flex;
+	overflow: hidden;
+	position: relative;
+
+	ul:first-of-type {
+		display: flex;
+	
+		li {
+			flex: 0 0 calc(100% / 3);
+			padding: .5rem .25rem;
+		}
+	}
+
+	> button {
+		background: rgba(0, 0, 0, 0.5);
+		border: 0;
+		border-radius: 35px;
+		color: rgb(255, 255, 255);
+		cursor: pointer;
+		height: 43px;
+		position: absolute;
+		width: 43px;
+		
+		&::before {
+			font-family: revicons;
+			font-size: 20px;
+		}
+		
+		&:hover {
+			background: rgba(0, 0, 0, 0.8);
+		}
+
+		&:first-of-type {
+			left: calc(4% + 1px);
+			
+			&::before {
+				content: "\e824";
+			}
+		}
+
+		&:nth-of-type(2) {
+			right: calc(4% + 1px);
+			
+			&::before {
+				content: "\e825";
+			}
+		}
+	}
+	
+	ul:nth-of-type(2) {
+		bottom: 0;
+		display: flex;
+		gap: 6px;
+		justify-content: center;
+		left: 0;
+		position: absolute;
+		right: 0;
+		
+		button {
+			border: 2px solid rgb(128, 128, 128);
+			border-radius: 50%;
+			cursor: pointer;
+			height: 12px;
+			width: 12px;
+		}
+	}
+}

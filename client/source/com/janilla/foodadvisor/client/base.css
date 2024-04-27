@@ -8,7 +8,7 @@ html {
 	line-height: 1.5;
 }
 
-body, h1, h2, h3, p, ul, li {
+body, h1, h2, h3, p, ul, li, dl, dt, dd {
 	margin: 0;
 	padding: 0;
 }
