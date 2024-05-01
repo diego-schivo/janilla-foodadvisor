@@ -28,45 +28,44 @@ import java.io.IOException;
 import com.janilla.foodadvisor.api.Global;
 import com.janilla.frontend.RenderEngine;
 import com.janilla.http.HttpExchange;
-import com.janilla.persistence.Persistence;
+import com.janilla.io.IO;
 import com.janilla.web.TemplateHandlerFactory;
 
-public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
+abstract class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 
-	protected static ThreadLocal<Layout> layout = new ThreadLocal<>();
-
-	protected Persistence persistence;
-
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
-	}
+	public FoodAdvisorClientApp application;
 
 	@Override
 	protected void render(RenderEngine.Entry input, HttpExchange exchange) throws IOException {
-		var l = layout.get();
-		var r = false;
-		if (l == null) {
-			var ii = persistence.getCrud(Global.class).list(0, 1).ids();
-			var g = ii.length > 0 ? persistence.getCrud(Global.class).read(ii[0]) : null;
-			l = new Layout(persistence, ((FoodAdvisorClientApp.Exchange) exchange).getLocale(), g, input);
-			if (l != null) {
-				input = RenderEngine.Entry.of(null, l, null);
-				r = true;
-			}
-		}
-		try {
-			super.render(input, exchange);
-		} finally {
-			if (r)
-				layout.remove();
-		}
+		applyLayout(input, exchange, x -> super.render(x, exchange));
 	}
 
 	@Override
 	protected RenderEngine newRenderEngine(HttpExchange exchange) {
-		var e = new CustomRenderEngine();
+		var e = application.new RenderEngine();
 		e.locale = ((FoodAdvisorClientApp.Exchange) exchange).getLocale();
-		e.persistence = persistence;
 		return e;
+	}
+
+	static ThreadLocal<Layout> layout = new ThreadLocal<>();
+
+	void applyLayout(RenderEngine.Entry input, HttpExchange exchange, IO.Consumer<RenderEngine.Entry> consumer)
+			throws IOException {
+		var l = layout.get();
+		var n = l == null;
+		if (n) {
+			var m = ((FoodAdvisorClientApp.Exchange) exchange).getLocale();
+			var p = application.getPersistence();
+			var ii = p.getCrud(Global.class).list(0, 1).ids();
+			var g = ii.length > 0 ? p.getCrud(Global.class).read(ii[0]) : null;
+			l = new Layout(m, g, input);
+			input = RenderEngine.Entry.of(null, l, null);
+		}
+		try {
+			consumer.accept(input);
+		} finally {
+			if (n)
+				layout.remove();
+		}
 	}
 }

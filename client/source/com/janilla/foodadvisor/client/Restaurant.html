@@ -8,36 +8,41 @@
 			</a>
 		</div>
 		<div>
-			<!--${images[0]}-->
-			<!--${gallery}-->
+			<{gallery.images[0]}>
+			<{gallery}>
 		</div>
 		<div>
-			<h2 class="category">${category.name}</h2>
-			<h1 class="name">${name}</h1>
+			<h2 class="category">{category.name}</h2>
+			<h1 class="name">{name}</h1>
 			<div class="stars-parent">
-				<span class="stars">
-					<!--${stars}-->
-				</span>
-				<span class="review-summary">${reviewSummary}</span>
-				<span class="price">${price}</span>
+				<{stars}>
+				<span class="review-summary">{reviewSummary}</span>
+				<span class="price">{price}</span>
 			</div>
-			<!--${information}-->
+			<{information}>
 		</div>
 	</div>
-	<!--${reviews}-->
+	<{reviews}>
+	<{relatedRestaurants}>
 </div>
 
-<template id="Restaurant-star">
-	<svg fill="${fill}" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+<template id="Restaurant-stars">
+	<span class="stars">
+		<{}>
+	</span>
+</template>
+
+<template id="Restaurant-stars-item">
+	<svg fill="{fill}" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
 		<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
 	</svg>
 </template>
 
 <template id="Restaurant-Information">
 	<div class="information">
-		<p class="description">${description}</p>
-		<!--${openingHours}-->
-		<!--${location}-->
+		<p class="description">{description}</p>
+		<{openingHours}>
+		<{location}>
 	</div>
 </template>
 
@@ -51,14 +56,14 @@
 		<div>
 			<h2>Opening hours</h2>
 			<ul>
-				<!--${}-->
+				<{}>
 			</ul>
 		</div>
 	</div>
 </template>
 
 <template id="Restaurant-OpeningHour">
-	<li>${dayInterval} ${openingHour} - ${closingHour}</li>
+	<li>{dayInterval} {openingHour} - {closingHour}</li>
 </template>
 
 <template id="Restaurant-Location">
@@ -71,14 +76,14 @@
 		<div>
 			<h2>Information</h2>
 			<ul>
-				<!--${items}-->
+				<{items}>
 			</ul>
 		</div>
 	</div>
 </template>
 
 <template id="Restaurant-Location-item">
-	<li>${}</li>
+	<li>{}</li>
 </template>
 
 <template id="Restaurant-reviews">
@@ -86,43 +91,61 @@
 		<h2>Reviews</h2>
 		<div class="overall-rating">
 			<h3>Overall Rating</h3>
-			<p>${averageSummary}</p>
-			<p>${reviewSummary}</p>
+			<p>{averageSummary}</p>
+			<p>{reviewSummary}</p>
 			<dl>
-				<!--${notes}-->
+				<{notes}>
 			</dl>
 		</div>
 		<div>
 			<ul>
-				<!--${}-->
+				<{}>
 			</ul>
 		</div>
 	</div>
 </template>
 
 <template id="Restaurant-note">
-	<dt>${key}</dt>
-	<dd style="width: calc(100% / ${reviews.length} * ${value})">${value}</dd>
+	<dt>{key}</dt>
+	<dd data-{style}>{value}</dd>
 </template>
 
 <template id="Restaurant-review">
 	<li class="review">
 		<div class="picture-parent">
-			<!--${author.picture}-->
+			<{author.picture}>
 		</div>
 		<div>
 			<div>
 				<p class="username-parent">
-					<span class="username">${author.username}</span>
-					<span class="time">${timeSummary}</span>
+					<span class="username">{author.username}</span>
+					<span class="time">{timeSummary}</span>
 				</p>
 				<div class="note">
 					<span class="stars">
-						<!--${stars}-->
+						<{stars}>
 					</span>
 				</div>
 			</div>
-			<p class="content">${content}</p>
+			<p class="content">{content}</p>
 		</div>
+	</li>
+</template>
+
+<template id="Restaurant-RelatedRestaurants">
+	<div class="related-restaurants">
+		<{header}>
+		<ul>
+			<{restaurants}>
+		</ul>
+	</div>
+</template>
+
+<template id="Restaurant-RelatedRestaurants-item">
+	<li>
+		<a href="/restaurants/{slug}">
+			<{image}>
+			<h3>{name}</h3>
+		</a>
 	</li>
 </template>

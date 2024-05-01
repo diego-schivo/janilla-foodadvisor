@@ -24,7 +24,6 @@
 package com.janilla.foodadvisor.client;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Properties;
 import java.util.function.Supplier;
 
@@ -33,7 +32,6 @@ import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
-import com.janilla.persistence.Persistence;
 import com.janilla.util.Lazy;
 
 public class FoodAdvisorClientApp {
@@ -55,19 +53,11 @@ public class FoodAdvisorClientApp {
 		s.run();
 	}
 
-	Properties configuration;
+	private Properties configuration;
 
-	private IO.Supplier<Persistence> persistence = IO.Lazy.of(() -> {
-		var b = new CustomPersistenceBuilder();
-		b.setApplication(this);
-		return b.build();
-	});
+	private Supplier<Persistence> persistence = Lazy.of(() -> (Persistence) new PersistenceBuilder().build());
 
-	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
-		var b = new CustomApplicationHandlerBuilder();
-		b.setApplication(this);
-		return b.build();
-	});
+	private Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> new HandlerBuilder().build());
 
 	public Properties getConfiguration() {
 		return configuration;
@@ -78,18 +68,38 @@ public class FoodAdvisorClientApp {
 	}
 
 	public Persistence getPersistence() {
-		try {
-			return persistence.get();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		return persistence.get();
 	}
 
 	public IO.Consumer<HttpExchange> getHandler() {
 		return handler.get();
 	}
 
-	class Server extends HttpServer {
+	public class Exchange extends CustomExchange {
+	}
+
+	public class HandlerBuilder extends CustomHandlerBuilder {
+		{
+			application = FoodAdvisorClientApp.this;
+		}
+	}
+
+	public class Persistence extends CustomPersistence {
+	}
+
+	public class PersistenceBuilder extends CustomPersistenceBuilder {
+		{
+			application = FoodAdvisorClientApp.this;
+		}
+	}
+
+	public class RenderEngine extends CustomRenderEngine {
+		{
+			persistence = FoodAdvisorClientApp.this.getPersistence();
+		}
+	}
+
+	public class Server extends HttpServer {
 
 		@Override
 		protected HttpExchange newExchange(HttpRequest request) {
@@ -97,6 +107,9 @@ public class FoodAdvisorClientApp {
 		}
 	}
 
-	public class Exchange extends CustomExchange {
+	public class TemplateHandlerFactory extends CustomTemplateHandlerFactory {
+		{
+			application = FoodAdvisorClientApp.this;
+		}
 	}
 }

@@ -60,17 +60,18 @@ public class AdminWeb {
 	}
 
 	@Handle(method = "POST", path = "/admin/login")
-	public String login(Credential credential) throws IOException {
+	public String login(Credential credential) {
 		var i = persistence.getCrud(User.class).find("email", credential.email);
 		var u = i > 0 ? persistence.getCrud(User.class).read(i) : null;
 		{
 			var f = HexFormat.of();
-			var h = f.formatHex(CustomPersistenceBuilder.hash(credential.password.toCharArray(), f.parseHex(u.passwordSalt)));
-			if (!h.equals(u.passwordHash))
+			var h = f.formatHex(
+					CustomPersistenceBuilder.hash(credential.password.toCharArray(), f.parseHex(u.passwordSalt())));
+			if (!h.equals(u.passwordHash()))
 				u = null;
 		}
 		var h = Map.of("alg", "HS256", "typ", "JWT");
-		var p = Map.of("sub", u.email);
+		var p = Map.of("sub", u.email());
 		var t = Jwt.generateToken(h, p, configuration.getProperty("foodadvisor.jwt.key"));
 		return t;
 	}
@@ -90,14 +91,12 @@ public class AdminWeb {
 		}
 		var i = Util.findIndexes(bb, "\r\n\r\n".getBytes(), 1)[0];
 		var hh = Net.parseEntryList(new String(bb, 0, i), "\r\n", ":");
-		var f = new File();
-		f.name = Arrays.stream(hh.get("Content-Disposition").split(";")).map(String::trim)
+		var n = Arrays.stream(hh.get("Content-Disposition").split(";")).map(String::trim)
 				.filter(x -> x.startsWith("filename=")).map(x -> x.substring(x.indexOf('=') + 1))
 				.map(x -> x.startsWith("\"") && x.endsWith("\"") ? x.substring(1, x.length() - 1) : x).findFirst()
 				.orElseThrow();
-		f.bytes = Arrays.copyOfRange(bb, i + 4, bb.length);
-		persistence.getCrud(File.class).create(f);
-		return f.id;
+		bb = Arrays.copyOfRange(bb, i + 4, bb.length);
+		return persistence.getCrud(File.class).create(new File(null, n, bb)).id();
 	}
 
 	public record Credential(String email, String password) {

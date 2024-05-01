@@ -24,14 +24,7 @@
 package com.janilla.foodadvisor.api;
 
 import com.janilla.persistence.Store;
-import com.janilla.reflect.Order;
 
 @Store
-public class Category {
-
-	@Order(1)
-	public Long id;
-
-	@Order(2)
-	public String name;
+public record Category(Long id, String name) {
 }

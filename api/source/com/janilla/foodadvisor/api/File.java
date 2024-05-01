@@ -24,17 +24,7 @@
 package com.janilla.foodadvisor.api;
 
 import com.janilla.persistence.Store;
-import com.janilla.reflect.Order;
 
 @Store
-public class File {
-
-	@Order(1)
-	public Long id;
-	
-	@Order(2)
-	public String name;
-	
-	@Order(3)
-	public byte[] bytes;
+public record File(Long id, String name, byte[] bytes) {
 }

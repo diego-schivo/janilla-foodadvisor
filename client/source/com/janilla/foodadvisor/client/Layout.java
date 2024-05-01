@@ -23,41 +23,32 @@
  */
 package com.janilla.foodadvisor.client;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Locale;
 
-import com.janilla.foodadvisor.api.Asset;
 import com.janilla.foodadvisor.api.Global;
+import com.janilla.foodadvisor.api.Link;
 import com.janilla.frontend.RenderEngine;
 import com.janilla.frontend.Renderer;
-import com.janilla.persistence.Persistence;
 import com.janilla.web.Render;
 
 @Render(template = "Layout.html")
-public record Layout(Persistence persistence, Locale locale, Global global, RenderEngine.Entry entry)
-		implements Renderer {
+public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements Renderer {
 
 	public Navbar navbar() {
-		return new Navbar(global != null ? global.navigation : null);
+		return global != null ? new Navbar(global.navigation()) : null;
 	}
 
 	@Override
 	public boolean evaluate(RenderEngine engine) {
 		record A(Layout layout, Object content) {
 		}
-		record B(Long id, Object file) {
+		record B(Link link, Object target) {
 		}
 		return engine.match(A.class, (i, o) -> {
 			o.setValue(entry.getValue());
 			o.setType(entry.getType());
 		}) || engine.match(B.class, (i, o) -> {
-			Asset a;
-			try {
-				a = persistence.getCrud(Asset.class).read(i.id);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			o.setValue(i.link.uri().getScheme() != null ? "target=\"_blank\"" : null);
 		});
 	}
 }

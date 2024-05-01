@@ -24,28 +24,19 @@
 package com.janilla.foodadvisor.api;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import com.janilla.persistence.Store;
-import com.janilla.reflect.Order;
+import com.janilla.web.Render;
 
 @Store
-public class Global {
+public record Global(Long id, Navigation navigation, Footer footer) {
 
-	@Order(1)
-	public Long id;
+	public record Navigation(List<Link> links, Link leftButton, Link rightButton) {
+	}
 
-	@Order(2)
-	public Navigation navigation;
-
-	public static class Navigation { // implements Component {
-
-		@Order(1)
-		public List<Link> links;
-
-		@Order(2)
-		public Link leftButton;
-
-		@Order(3)
-		public Link rightButton;
+	@Render(template = "Footer.html")
+	public record Footer(Map<Locale, String> label) {
 	}
 }

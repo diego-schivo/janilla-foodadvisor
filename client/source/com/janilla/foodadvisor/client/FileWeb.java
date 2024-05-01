@@ -36,11 +36,7 @@ import com.janilla.web.NotFoundException;
 
 public class FileWeb {
 
-	Persistence persistence;
-
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
-	}
+	public Persistence persistence;
 
 	@Handle(method = "GET", path = "/files/(\\d+)")
 	public void getFile(long id, HttpResponse response) throws IOException {
@@ -48,15 +44,15 @@ public class FileWeb {
 		if (f == null)
 			throw new NotFoundException();
 		response.setStatus(new Status(200, "OK"));
-		var n = f.name;
+		var n = f.name();
 		var e = n.substring(n.lastIndexOf('.') + 1);
 		var hh = response.getHeaders();
 		switch (e) {
-		case "png":
-			hh.set("Content-Type", "image/png");
+		case "jpg", "png":
+			hh.set("Content-Type", "image/" + e);
 			break;
 		}
-		var bb = f.bytes;
+		var bb = f.bytes();
 		hh.set("Content-Length", String.valueOf(bb.length));
 		var b = (WritableByteChannel) response.getBody();
 		IO.write(bb, b);

@@ -27,22 +27,8 @@ import java.util.List;
 
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
-import com.janilla.reflect.Order;
 
 @Store
-public class Page {
-
-	@Order(1)
-	public Long id;
-
-	@Order(2)
-	public String name;
-
-	@Order(3)
-	@Index
-	public String slug;
-
-	@Order(5)
-	@Reference({ Features.class, Hero.class, Testimonial.class })
-	public List<Object> components;
+public record Page(Long id, String name, @Index String slug, @Reference( {
+		Features.class, Hero.class, Testimonial.class }) List<Object> components){
 }

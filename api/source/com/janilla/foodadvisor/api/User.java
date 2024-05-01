@@ -28,31 +28,8 @@ import java.util.Map;
 
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
-import com.janilla.reflect.Order;
 
 @Store
-public class User {
-
-	@Order(1)
-	public Long id;
-
-	@Order(2)
-	public String username;
-
-	@Order(3)
-	@Index
-	public String email;
-
-	@Order(4)
-	public String passwordHash;
-
-	@Order(5)
-	public String passwordSalt;
-
-	@Order(6)
-	@Reference(Asset.class)
-	public Long picture;
-
-	@Order(7)
-	public Map<Locale, String> job;
+public record User(Long id, String username, @Index String email, String passwordHash, String passwordSalt,
+		@Reference(Asset.class) Long picture, Map<Locale, String> job) {
 }

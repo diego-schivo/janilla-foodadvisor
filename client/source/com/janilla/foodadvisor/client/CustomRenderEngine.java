@@ -31,11 +31,11 @@ import java.util.Map;
 import com.janilla.frontend.RenderEngine;
 import com.janilla.persistence.Persistence;
 
-public class CustomRenderEngine extends RenderEngine {
+abstract class CustomRenderEngine extends RenderEngine {
 
-	public Locale locale;
+	Persistence persistence;
 
-	public Persistence persistence;
+	Locale locale;
 
 	@Override
 	protected Entry entryOf(Object key, Object value, AnnotatedType type) {

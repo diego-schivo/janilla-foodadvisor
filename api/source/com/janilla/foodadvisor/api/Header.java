@@ -26,15 +26,8 @@ package com.janilla.foodadvisor.api;
 import java.util.Locale;
 import java.util.Map;
 
-import com.janilla.reflect.Order;
 import com.janilla.web.Render;
 
 @Render(template = "Header.html")
-public class Header {
-
-	@Order(1)
-	public Map<Locale, String> label;
-
-	@Order(2)
-	public Map<Locale, String> title;
+public record Header(Map<Locale, String> label, Map<Locale, String> title) {
 }

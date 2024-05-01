@@ -12,7 +12,7 @@
 
 <template id="Admin-unauthenticated">
 	<div class="admin unauthenticated">
-		<!--${login}-->
+		<{login}>
 	</div>
 </template>
 
@@ -24,27 +24,27 @@
 					Content Type
 					<select name="contentType">
 						<option></option>
-						<!--${contentTypes}-->
+						<{contentTypes}>
 					</select>
 				</label>
 			</div>
 			<div>
 				<label>Locales</label>
-				<!--${availableLocales}-->
+				<{availableLocales}>
 			</div>
 		</div>
-		<!--${content}-->
+		<{content}>
 	</div>
 </template>
 
 <template id="Admin-contentType">
-	<option>${}</option>
+	<option>{}</option>
 </template>
 
 <template id="Admin-availableLocale">
 	<label>
-		<input type="checkbox" name="locale" value="${}" />
-		${}
+		<input type="checkbox" name="locale" value="{}" />
+		{}
 	</label>
 </template>
 

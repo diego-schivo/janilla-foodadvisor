@@ -25,18 +25,7 @@ package com.janilla.foodadvisor.api;
 
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
-import com.janilla.reflect.Order;
 
 @Store
-public class Restaurants {
-
-	@Order(1)
-	public Long id;
-
-	@Order(2)
-	public Header header;
-
-	@Order(3)
-	@Index
-	public String slug;
+public record Restaurants(Long id, @Index String slug, Header header) {
 }

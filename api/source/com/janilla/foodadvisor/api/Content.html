@@ -1,6 +1,6 @@
 <div class="content">
-	<!--${list}-->
-	<!--${form}-->
+	<{list}>
+	<{form}>
 </div>
 
 <template id="Content-empty">
@@ -11,20 +11,20 @@
 	<table class="list">
 		<thead>
 			<tr>
-				<!--${headers}-->
+				<{headers}>
 				<th>
-					<!--${createButton}-->
+					<{createButton}>
 				</th>
 			</tr>
 		</thead>
 		<tbody>
-			<!--${rows}-->
+			<{rows}>
 		</tbody>
 	</table>
 </template>
 
 <template id="Content-Header">
-	<th>${}</th>
+	<th>{}</th>
 </template>
 
 <template id="Content-createButton">
@@ -33,29 +33,29 @@
 
 <template id="Content-Row">
 	<tr>
-		<!--${cells}-->
+		<{cells}>
 		<td>
-			<!--${editButton}-->
-			<!--${selectButton}-->
+			<{editButton}>
+			<{selectButton}>
 		</td>
 	</tr>
 </template>
 
 <template id="Content-Cell">
-	<td>${}</td>
+	<td>{}</td>
 </template>
 
 <template id="Content-editButton">
-	<button type="button" class="edit" name="id" value="${id}">Edit</button>
+	<button type="button" class="edit" name="id" value="{id}">Edit</button>
 </template>
 
 <template id="Content-selectButton">
-	<button type="button" class="select" name="id" value="${id}">Select</button>
+	<button type="button" class="select" name="id" value="{id}">Select</button>
 </template>
 
 <template id="Content-Form">
 	<form class="form">
-		<!--${control}-->
+		<{control}>
 		<ul class="buttons">
 			<li>
 				<button class="save">Save</button>

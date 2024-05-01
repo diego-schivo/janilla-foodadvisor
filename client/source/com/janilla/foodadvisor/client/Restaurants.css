@@ -2,8 +2,15 @@
 	display: flex;
 	flex-direction: column;
 	gap: 6rem;
-	margin: 0 auto;
-	max-width: 1536px;
+	
+	> div {
+		display: flex;
+		flex-direction: column;
+		gap: 6rem;
+		margin: 0 auto;
+		max-width: 1536px;
+		width: 100%;
+	}
 	
 	.filters {
 		display: flex;

@@ -34,15 +34,16 @@ import com.janilla.web.Render;
 public record Navbar(Global.Navigation navigation) {
 
 	public @Render(template = "Navbar-Logo.html") Link logo() {
-		return navigation != null ? navigation.leftButton : null;
+		return navigation != null ? navigation.leftButton() : null;
 	}
 
 	public @Render(template = "Navbar-Nav.html") List<Link> nav() {
-		return navigation != null ? navigation.links : null;
+		var ll = navigation != null ? navigation.links() : null;
+		return ll != null && !ll.isEmpty() ? ll : null;
 	}
 
-	public @Render(template = "Navbar-CTA.html") Link cta() {
-		return navigation != null ? navigation.rightButton : null;
+	public @Render(template = "Navbar-CTA.html") String cta() {
+		return navigation != null && navigation.rightButton() != null ? "cta" : null;
 	}
 
 	public LocalSwitch localSwitch() {

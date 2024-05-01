@@ -24,15 +24,7 @@
 package com.janilla.foodadvisor.api;
 
 import com.janilla.persistence.Store;
-import com.janilla.reflect.Order;
 
 @Store
-public class Asset {
-
-	@Order(1)
-	public Long id;
-
-	@Order(2)
-	@Reference(File.class)
-	public Long file;
+public record Asset(Long id, @Reference(File.class) Long file) {
 }

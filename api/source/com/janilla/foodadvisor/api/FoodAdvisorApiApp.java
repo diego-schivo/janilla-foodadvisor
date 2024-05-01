@@ -24,7 +24,6 @@
 package com.janilla.foodadvisor.api;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Properties;
 import java.util.function.Supplier;
 
@@ -56,17 +55,9 @@ public class FoodAdvisorApiApp {
 
 	Properties configuration;
 
-	private IO.Supplier<Persistence> persistence = IO.Lazy.of(() -> {
-		var b = new CustomPersistenceBuilder();
-		b.setApplication(this);
-		return b.build();
-	});
+	private Supplier<Persistence> persistence = Lazy.of(() -> new PersistenceBuilder().build());
 
-	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> {
-		var b = new CustomHandlerBuilder();
-		b.setApplication(this);
-		return b.build();
-	});
+	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> new HandlerBuilder().build());
 
 	public Properties getConfiguration() {
 		return configuration;
@@ -77,29 +68,37 @@ public class FoodAdvisorApiApp {
 	}
 
 	public Persistence getPersistence() {
-		try {
-			return persistence.get();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		return persistence.get();
 	}
 
 	public IO.Consumer<HttpExchange> getHandler() {
 		return handler.get();
 	}
 
-	class Server extends HttpServer {
-
-		@Override
-		protected HttpExchange newExchange(HttpRequest request) {
-			return new Exchange();
-		}
-	}
-
 	public class Exchange extends CustomExchange {
 		{
 			configuration = getConfiguration();
 			persistence = getPersistence();
+		}
+	}
+
+	public class HandlerBuilder extends CustomHandlerBuilder {
+		{
+			application = FoodAdvisorApiApp.this;
+		}
+	}
+
+	public class PersistenceBuilder extends CustomPersistenceBuilder {
+		{
+			application = FoodAdvisorApiApp.this;
+		}
+	}
+
+	public class Server extends HttpServer {
+
+		@Override
+		protected HttpExchange newExchange(HttpRequest request) {
+			return new Exchange();
 		}
 	}
 }

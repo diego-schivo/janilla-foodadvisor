@@ -27,14 +27,14 @@ import com.janilla.web.AnnotationDrivenToMethodInvocation;
 import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.MethodHandlerFactory;
 
-public class CustomApplicationHandlerBuilder extends ApplicationHandlerBuilder {
+abstract class CustomHandlerBuilder extends ApplicationHandlerBuilder {
 
 	@Override
 	protected MethodHandlerFactory buildMethodHandlerFactory() {
 		var f = super.buildMethodHandlerFactory();
 		((AnnotationDrivenToMethodInvocation) f.getToInvocation()).setComparator((i1, i2) -> {
-			var p1 = i1.object().getClass() == PageWeb.class;
-			var p2 = i2.object().getClass() == PageWeb.class;
+			var p1 = i1.object() instanceof PageWeb;
+			var p2 = i2.object() instanceof PageWeb;
 			return Boolean.compare(p1, p2);
 		});
 		return f;

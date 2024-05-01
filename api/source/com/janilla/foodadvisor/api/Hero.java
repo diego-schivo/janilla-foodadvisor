@@ -27,21 +27,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.janilla.reflect.Order;
 import com.janilla.web.Render;
 
 @Render(template = "Hero.html")
-public class Hero { // implements Component {
-
-	@Order(1)
-	public List<@Render(template = "Hero-image.html") Long> images;
-
-	@Order(2)
-	public Map<Locale, String> title;
-
-	@Order(3)
-	public Map<Locale, String> text;
-
-	@Order(4)
-	public List<Link> buttons;
+public record Hero(List<@Render(template = "Hero-image.html") Long> images, Map<Locale, String> title,
+		Map<Locale, String> text, List<Link> buttons) {
 }

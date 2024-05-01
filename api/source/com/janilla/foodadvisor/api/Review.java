@@ -27,29 +27,8 @@ import java.time.Instant;
 
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
-import com.janilla.reflect.Order;
 
 @Store
-public class Review {
-
-	@Order(1)
-	public Long id;
-	
-	@Order(2)
-	public Instant creationTime;
-
-	@Order(3)
-	public String content;
-
-	@Order(4)
-	public Integer note;
-
-	@Order(5)
-	@Reference(User.class)
-	public Long author;
-
-	@Index
-	@Order(6)
-	@Reference(Restaurant.class)
-	public Long restaurant;
+public record Review(Long id, Instant creationTime, String content, Integer note, @Reference(User.class) Long author,
+		@Index @Reference(Restaurant.class) Long restaurant) {
 }

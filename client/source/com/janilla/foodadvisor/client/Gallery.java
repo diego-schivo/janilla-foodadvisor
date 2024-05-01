@@ -26,8 +26,13 @@ package com.janilla.foodadvisor.client;
 import java.util.List;
 
 import com.janilla.foodadvisor.api.Asset;
+import com.janilla.persistence.Persistence;
 import com.janilla.web.Render;
 
 @Render(template = "Gallery.html")
 public record Gallery(List<@Render(template = "Gallery-image.html") Asset> images) {
+
+	public static Gallery of(List<Long> images, Persistence persistence) {
+		return new Gallery(images.stream().map(x -> persistence.getCrud(Asset.class).read(x)).toList());
+	}
 }

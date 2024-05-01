@@ -1,15 +1,15 @@
-<div class="list-control control ${level}">
+<div class="list-control control {level}">
 	<ol>
-		<!--${items}-->
+		<{items}>
 	</ol>
-	<button class="add" name="${name}">Add</button>
-	<!--${dialog}-->
+	<button class="add" name="{name}">Add</button>
+	<{dialog}>
 </div>
 
 <template id="ListControl-Item">
 	<li class="item">
-		<label for="${name}">${label}</label>
-		<!--${control}-->
+		<label for="{name}">{label}</label>
+		<{control}>
 	</li>
 </template>
 
@@ -17,11 +17,11 @@
 	<dialog class="dialog">
 		<select class="type">
 			<option value=""></option>
-			<!--${referenceTypes}-->
+			<{referenceTypes}>
 		</select>
 	</dialog>
 </template>
 
 <template id="ListControl-Option">
-	<option value="${}">${}</option>
+	<option value="{}">{}</option>
 </template>

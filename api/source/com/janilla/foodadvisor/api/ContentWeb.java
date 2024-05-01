@@ -23,7 +23,6 @@
  */
 package com.janilla.foodadvisor.api;
 
-import java.io.IOException;
 import java.util.List;
 
 import com.janilla.persistence.Persistence;
@@ -46,7 +45,7 @@ public class ContentWeb {
 	}
 
 	@Handle(method = "GET", path = "/api/contents/(\\w+)")
-	public <T> List<T> list(String name) throws ClassNotFoundException, IOException {
+	public <T> List<T> list(String name) throws ClassNotFoundException {
 		@SuppressWarnings("unchecked")
 		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.api." + name);
 		var ii = persistence.getCrud(c).list();
@@ -54,28 +53,28 @@ public class ContentWeb {
 	}
 
 	@Handle(method = "POST", path = "/api/contents/(\\w+)")
-	public <T> void create(String name, T object) throws ClassNotFoundException, IOException {
+	public <T> void create(String name, T object) throws ClassNotFoundException {
 		@SuppressWarnings("unchecked")
 		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.api." + name);
 		persistence.getCrud(c).create(object);
 	}
 
 	@Handle(method = "GET", path = "/api/contents/(\\w+)/(\\d+)")
-	public <T> T read(String name, long id) throws ClassNotFoundException, IOException {
+	public <T> T read(String name, long id) throws ClassNotFoundException {
 		@SuppressWarnings("unchecked")
 		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.api." + name);
 		return persistence.getCrud(c).read(id);
 	}
 
 	@Handle(method = "PUT", path = "/api/contents/(\\w+)/(\\d+)")
-	public <T> void update(String name, long id, T object) throws ClassNotFoundException, IOException {
+	public <T> void update(String name, long id, T object) throws ClassNotFoundException {
 		@SuppressWarnings("unchecked")
 		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.api." + name);
 		persistence.getCrud(c).update(id, t -> Reflection.copy(object, t, n -> !n.equals("id")));
 	}
 
 	@Handle(method = "DELETE", path = "/api/contents/(\\w+)/(\\d+)")
-	public <T> void delete(String name, long id) throws ClassNotFoundException, IOException {
+	public <T> void delete(String name, long id) throws ClassNotFoundException {
 		@SuppressWarnings("unchecked")
 		var c = (Class<T>) Class.forName("com.janilla.foodadvisor.api." + name);
 		persistence.getCrud(c).delete(id);

@@ -23,15 +23,14 @@
  */
 package com.janilla.foodadvisor.api;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 import com.janilla.http.HttpExchange;
-import com.janilla.io.IO;
 import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
+import com.janilla.util.Lazy;
 import com.janilla.web.UnauthenticatedException;
 
 abstract class CustomExchange extends HttpExchange {
@@ -40,7 +39,7 @@ abstract class CustomExchange extends HttpExchange {
 
 	Persistence persistence;
 
-	private IO.Supplier<User> user = IO.Lazy.of(() -> {
+	private Supplier<User> user = Lazy.of(() -> {
 		var a = getRequest().getHeaders().get("Authorization");
 		var t = a != null && a.startsWith("Bearer ") ? a.substring("Bearer ".length()) : null;
 		Map<String, ?> p;
@@ -57,11 +56,7 @@ abstract class CustomExchange extends HttpExchange {
 	});
 
 	public User getUser() {
-		try {
-			return user.get();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+		return user.get();
 	}
 
 	public void requireUser() {

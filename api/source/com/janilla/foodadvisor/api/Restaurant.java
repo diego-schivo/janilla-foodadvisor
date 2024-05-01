@@ -26,45 +26,16 @@ package com.janilla.foodadvisor.api;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import com.janilla.persistence.Index;
 import com.janilla.persistence.Store;
-import com.janilla.reflect.Order;
 import com.janilla.web.Render;
 
 @Store
-public class Restaurant {
-
-	@Order(1)
-	public Long id;
-
-	@Order(2)
-	public String name;
-
-	@Index
-	@Order(3)
-	public String slug;
-
-	@Order(4)
-	@Reference(Asset.class)
-	public List<@Render(template = "image.html") Long> images;
-
-	@Order(5)
-	public Integer price;
-
-	@Order(6)
-	public Information information;
-
-	@Index
-	@Order(7)
-	@Reference(Category.class)
-	public Long category;
-
-	@Index
-	@Order(8)
-	@Reference(Place.class)
-	public Long place;
+public record Restaurant(Long id, String name, @Index String slug,
+		@Reference(Asset.class) List<@Render(template = "image.html") Long> images,
+		@Index @Reference(Category.class) Long category, @Index @Reference(Place.class) Long place, Integer price,
+		Information information, RelatedRestaurants relatedRestaurants) {
 
 	@Render(template = "Restaurant-Information.html")
 	public record Information(Map<Locale, String> description,
@@ -77,9 +48,8 @@ public class Restaurant {
 
 	@Render(template = "Restaurant-Location.html")
 	public record Location(String address, String website, String phone) {
+	}
 
-		public List<@Render(template = "Restaurant-Location-item.html") String> items() {
-			return Stream.of(address, website, phone).filter(x -> x != null).toList();
-		}
+	public record RelatedRestaurants(Header header, @Reference(Restaurant.class) List<Long> restaurants) {
 	}
 }

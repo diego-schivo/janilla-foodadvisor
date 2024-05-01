@@ -1,7 +1,9 @@
+/*
 @font-face {
 	font-family: 'revicons';
 	src: url('/revicons.woff') format('woff');
 }
+*/
 
 .gallery {
 	align-items: center;
@@ -29,7 +31,9 @@
 		width: 43px;
 		
 		&::before {
+			/*
 			font-family: revicons;
+			*/
 			font-size: 20px;
 		}
 		
@@ -41,7 +45,10 @@
 			left: calc(4% + 1px);
 			
 			&::before {
+				/*
 				content: "\e824";
+				*/
+				content: "<"
 			}
 		}
 
@@ -49,7 +56,10 @@
 			right: calc(4% + 1px);
 			
 			&::before {
+				/*
 				content: "\e825";
+				*/
+				content: ">"
 			}
 		}
 	}

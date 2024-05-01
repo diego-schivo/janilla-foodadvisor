@@ -23,45 +23,26 @@
  */
 package com.janilla.foodadvisor.api;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Locale;
 import java.util.Map;
 
 import com.janilla.frontend.RenderEngine;
 import com.janilla.frontend.Renderer;
 import com.janilla.persistence.Persistence;
-import com.janilla.reflect.Order;
 import com.janilla.reflect.Reflection;
 import com.janilla.web.Render;
 
 @Render(template = "Testimonial.html")
-public class Testimonial implements Renderer {
-
-	@Order(1)
-	public Map<Locale, String> text;
-
-	@Order(2)
-	@Reference(User.class)
-	public @Render(template = "Testimonial-author.html") Long author;
+public record Testimonial(Map<Locale, String> text,
+		@Reference(User.class) @Render(template = "Testimonial-author.html") Long author) implements Renderer {
 
 	@Override
 	public boolean evaluate(RenderEngine engine) {
 		record A(Testimonial testimonial, Long author) {
 		}
 		return engine.match(A.class, (i, o) -> {
-			Persistence p;
-			try {
-				p = (Persistence) Reflection.property(engine.getClass(), "persistence").get(engine);
-			} catch (ReflectiveOperationException e) {
-				throw new RuntimeException(e);
-			}
-			User u;
-			try {
-				u = p.getCrud(User.class).read(i.author);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
-			}
+			var p = (Persistence) Reflection.property(engine.getClass(), "persistence").get(engine);
+			var u = p.getCrud(User.class).read(i.author);
 			o.setValue(u);
 		});
 	}

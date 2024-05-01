@@ -1,6 +1,6 @@
-<div class="object-control control ${level}">
+<div class="object-control control {level}">
 	<ul class="fields">
-		<!--${fields}-->
+		<{fields}>
 	</ul>
 	<ul class="buttons">
 		<li>
@@ -10,14 +10,14 @@
 </div>
 
 <template id="ObjectControl-empty">
-	<div class="object-control control ${level}">
+	<div class="object-control control {level}">
 		<button type="button" class="create">Create</button>
 	</div>
 </template>
 
 <template id="ObjectControl-Field">
 	<li>
-		<label for="${name}">${label}</label>
-		<!--${control}-->
+		<label for="{name}">{label}</label>
+		<{control}>
 	</li>
 </template>

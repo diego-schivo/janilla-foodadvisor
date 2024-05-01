@@ -1,10 +1,10 @@
 .control {
 	&.odd {
-		background: rgb(47, 47, 47);
+		background: light-dark(rgb(207, 207, 207), rgb(47, 47, 47));
 	}
 
 	&.even {
-		background: rgb(31, 31, 31);
+		background: light-dark(rgb(223, 223, 223), rgb(31, 31, 31));
 	}
 }
 

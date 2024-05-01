@@ -27,15 +27,8 @@ import java.net.URI;
 import java.util.Locale;
 import java.util.Map;
 
-import com.janilla.reflect.Order;
 import com.janilla.web.Render;
 
 @Render(template = "Link.html")
-public class Link { // implements Component {
-
-	@Order(1)
-	public URI uri;
-
-	@Order(2)
-	public Map<Locale, String> text;
+public record Link(URI uri, Map<Locale, String> text) {
 }

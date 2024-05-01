@@ -6,6 +6,7 @@
 		align-items: center;
 		display: flex;
 		gap: 6rem;
+		height: 100vh;
 		max-width: 1536px;
 	
 		> div:first-child {
@@ -71,6 +72,10 @@
 		&:first-child {
 			background: rgb(65, 179, 163);
 			color: white;
+			
+			&:hover {
+				background: rgb(58, 161, 146);
+			}
 		}
 		
 		> :nth-child(2) {

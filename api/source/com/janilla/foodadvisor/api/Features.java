@@ -27,28 +27,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.janilla.reflect.Order;
 import com.janilla.web.Render;
 
 @Render(template = "Features.html")
-public class Features {
+public record Features(Header header, List<@Render(template = "Features-card.html") Card> cards) {
 
-	@Order(1)
-	public Header header;
-
-	@Order(2)
-	public List<@Render(template = "Features-card.html") Card> cards;
-
-	public static class Card {
-
-		@Order(1)
-		public Map<Locale, String> title;
-
-		@Order(2)
-		public Map<Locale, String> text;
-
-		@Order(3)
-		@Reference(Asset.class)
-		public @Render(template = "image.html") Long image;
+	public record Card(Map<Locale, String> title, Map<Locale, String> text,
+			@Reference(Asset.class) @Render(template = "image.html") Long image) {
 	}
 }
