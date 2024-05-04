@@ -37,7 +37,7 @@ public class PageWeb {
 	public Persistence persistence;
 
 	@Handle(method = "GET", path = "([/a-z-]*/)([a-z-]*)")
-	public @Render(template = "Page.html") Page getPage(String prefix, String slug,
+	public @Render("Page.html") Page getPage(String prefix, String slug,
 			@Parameter(name = "lang") Locale locale, FoodAdvisorClientApp.Exchange exchange) {
 		if (locale != null)
 			exchange.setLocale(locale);

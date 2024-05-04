@@ -31,7 +31,7 @@ import com.janilla.frontend.RenderEngine;
 import com.janilla.frontend.Renderer;
 import com.janilla.web.Render;
 
-@Render(template = "Layout.html")
+@Render("Layout.html")
 public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements Renderer {
 
 	public Navbar navbar() {

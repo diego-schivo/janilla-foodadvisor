@@ -29,10 +29,10 @@ import java.util.Map;
 
 import com.janilla.web.Render;
 
-@Render(template = "Features.html")
-public record Features(Header header, List<@Render(template = "Features-card.html") Card> cards) {
+@Render("Features.html")
+public record Features(Header header, List<@Render("Features-card.html") Card> cards) {
 
 	public record Card(Map<Locale, String> title, Map<Locale, String> text,
-			@Reference(Asset.class) @Render(template = "image.html") Long image) {
+			@Reference(Asset.class) @Render("image.html") Long image) {
 	}
 }

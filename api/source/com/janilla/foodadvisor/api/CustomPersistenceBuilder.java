@@ -44,7 +44,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -60,7 +59,8 @@ public abstract class CustomPersistenceBuilder extends ApplicationPersistenceBui
 	@Override
 	public Persistence build() {
 		if (file == null) {
-			var c = (Properties) Reflection.property(application.getClass(), "configuration").get(application);
+			var a = factory.getEnclosing();
+			var c = (Properties) Reflection.property(a.getClass(), "configuration").get(a);
 			var p = c.getProperty("foodadvisor.database.file");
 			if (p.startsWith("~"))
 				p = System.getProperty("user.home") + p.substring(1);
@@ -80,10 +80,10 @@ public abstract class CustomPersistenceBuilder extends ApplicationPersistenceBui
 		return p;
 	}
 
-	@Override
-	protected Stream<String> getPackageNames() {
-		return Stream.concat(super.getPackageNames(), Stream.of("com.janilla.foodadvisor.api")).distinct();
-	}
+//	@Override
+//	protected Stream<String> getPackageNames() {
+//		return Stream.concat(super.getPackageNames(), Stream.of("com.janilla.foodadvisor.api")).distinct();
+//	}
 
 	static Random random = new SecureRandom();
 

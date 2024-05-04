@@ -33,20 +33,20 @@ import com.janilla.web.Render;
 
 @Store
 public record Restaurant(Long id, String name, @Index String slug,
-		@Reference(Asset.class) List<@Render(template = "image.html") Long> images,
+		@Reference(Asset.class) List<@Render("image.html") Long> images,
 		@Index @Reference(Category.class) Long category, @Index @Reference(Place.class) Long place, Integer price,
 		Information information, RelatedRestaurants relatedRestaurants) {
 
-	@Render(template = "Restaurant-Information.html")
+	@Render("Restaurant-Information.html")
 	public record Information(Map<Locale, String> description,
-			@Render(template = "Restaurant-openingHours.html") List<OpeningHour> openingHours, Location location) {
+			@Render("Restaurant-openingHours.html") List<OpeningHour> openingHours, Location location) {
 	}
 
-	@Render(template = "Restaurant-OpeningHour.html")
+	@Render("Restaurant-OpeningHour.html")
 	public record OpeningHour(String dayInterval, String openingHour, String closingHour) {
 	}
 
-	@Render(template = "Restaurant-Location.html")
+	@Render("Restaurant-Location.html")
 	public record Location(String address, String website, String phone) {
 	}
 

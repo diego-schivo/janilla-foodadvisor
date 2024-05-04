@@ -32,7 +32,9 @@ import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
 import com.janilla.persistence.Persistence;
+import com.janilla.reflect.Factory;
 import com.janilla.util.Lazy;
+import com.janilla.util.Util;
 
 public class FoodAdvisorApiApp {
 
@@ -43,29 +45,21 @@ public class FoodAdvisorApiApp {
 			try (var s = a.getClass().getResourceAsStream("configuration.properties")) {
 				c.load(s);
 			}
-			a.setConfiguration(c);
+			a.configuration = c;
 		}
 		a.getPersistence();
 
 		var s = a.new Server();
-		s.setPort(Integer.parseInt(a.getConfiguration().getProperty("foodadvisor.api.server.port")));
+		s.setPort(Integer.parseInt(a.configuration.getProperty("foodadvisor.api.server.port")));
 		s.setHandler(a.getHandler());
 		s.run();
 	}
 
-	Properties configuration;
+	public Properties configuration;
 
 	private Supplier<Persistence> persistence = Lazy.of(() -> new PersistenceBuilder().build());
 
-	Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> new HandlerBuilder().build());
-
-	public Properties getConfiguration() {
-		return configuration;
-	}
-
-	public void setConfiguration(Properties configuration) {
-		this.configuration = configuration;
-	}
+	private Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> new HandlerBuilder().build());
 
 	public Persistence getPersistence() {
 		return persistence.get();
@@ -77,20 +71,23 @@ public class FoodAdvisorApiApp {
 
 	public class Exchange extends CustomExchange {
 		{
-			configuration = getConfiguration();
+			configuration = FoodAdvisorApiApp.this.configuration;
 			persistence = getPersistence();
 		}
 	}
 
 	public class HandlerBuilder extends CustomHandlerBuilder {
-		{
-			application = FoodAdvisorApiApp.this;
-		}
+//		{
+//			application = FoodAdvisorApiApp.this;
+//		}
 	}
 
 	public class PersistenceBuilder extends CustomPersistenceBuilder {
 		{
-			application = FoodAdvisorApiApp.this;
+//			application = FoodAdvisorApiApp.this;
+			factory = new Factory();
+			factory.setTypes(Util.getPackageClasses(FoodAdvisorApiApp.class.getPackageName()).toList());
+			factory.setEnclosing(FoodAdvisorApiApp.this);
 		}
 	}
 

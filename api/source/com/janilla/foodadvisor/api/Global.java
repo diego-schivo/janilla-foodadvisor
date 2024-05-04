@@ -36,7 +36,7 @@ public record Global(Long id, Navigation navigation, Footer footer) {
 	public record Navigation(List<Link> links, Link leftButton, Link rightButton) {
 	}
 
-	@Render(template = "Footer.html")
+	@Render("Footer.html")
 	public record Footer(Map<Locale, String> label) {
 	}
 }

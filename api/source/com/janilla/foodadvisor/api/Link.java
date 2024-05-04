@@ -29,6 +29,6 @@ import java.util.Map;
 
 import com.janilla.web.Render;
 
-@Render(template = "Link.html")
+@Render("Link.html")
 public record Link(URI uri, Map<Locale, String> text) {
 }

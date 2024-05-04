@@ -42,20 +42,12 @@ import com.janilla.web.Render;
 
 public class AdminWeb {
 
-	private Persistence persistence;
+	public Persistence persistence;
 
-	private Properties configuration;
-
-	public void setPersistence(Persistence persistence) {
-		this.persistence = persistence;
-	}
-
-	public void setConfiguration(Properties configuration) {
-		this.configuration = configuration;
-	}
+	public Properties configuration;
 
 	@Handle(method = "GET", path = "/admin")
-	public @Render(template = "Admin.html") Object getPage() {
+	public @Render("Admin.html") Object getPage() {
 		return "page";
 	}
 

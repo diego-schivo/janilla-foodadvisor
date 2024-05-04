@@ -29,7 +29,7 @@ import java.util.Map;
 
 import com.janilla.web.Render;
 
-@Render(template = "Hero.html")
-public record Hero(List<@Render(template = "Hero-image.html") Long> images, Map<Locale, String> title,
+@Render("Hero.html")
+public record Hero(List<@Render("Hero-image.html") Long> images, Map<Locale, String> title,
 		Map<Locale, String> text, List<Link> buttons) {
 }

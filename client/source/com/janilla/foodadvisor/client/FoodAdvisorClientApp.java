@@ -28,11 +28,14 @@ import java.util.Properties;
 import java.util.function.Supplier;
 
 import com.janilla.foodadvisor.api.CustomPersistenceBuilder;
+import com.janilla.foodadvisor.api.FoodAdvisorApiApp;
 import com.janilla.http.HttpExchange;
 import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpServer;
 import com.janilla.io.IO;
+import com.janilla.reflect.Factory;
 import com.janilla.util.Lazy;
+import com.janilla.util.Util;
 
 public class FoodAdvisorClientApp {
 
@@ -79,9 +82,9 @@ public class FoodAdvisorClientApp {
 	}
 
 	public class HandlerBuilder extends CustomHandlerBuilder {
-		{
-			application = FoodAdvisorClientApp.this;
-		}
+//		{
+//			application = FoodAdvisorClientApp.this;
+//		}
 	}
 
 	public class Persistence extends CustomPersistence {
@@ -89,7 +92,10 @@ public class FoodAdvisorClientApp {
 
 	public class PersistenceBuilder extends CustomPersistenceBuilder {
 		{
-			application = FoodAdvisorClientApp.this;
+//			application = FoodAdvisorClientApp.this;
+			factory = new Factory();
+			factory.setTypes(Util.getPackageClasses(FoodAdvisorApiApp.class.getPackageName()).toList());
+			factory.setEnclosing(FoodAdvisorClientApp.this);
 		}
 	}
 

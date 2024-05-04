@@ -60,11 +60,11 @@ public class RestaurantWeb {
 		return Restaurant2.of(r, persistence);
 	}
 
-	@Render(template = "Restaurant.html")
+	@Render("Restaurant.html")
 	public record Restaurant2(@Flatten Restaurant restaurant, Gallery gallery, Category category, String reviewSummary,
 			String price, Double average,
-			List<Map.@Render(template = "Restaurant-note.html") Entry<String, Integer>> notes,
-			@Render(template = "Restaurant-reviews.html") List<Review2> reviews, RelatedRestaurants2 relatedRestaurants)
+			List<Map.@Render("Restaurant-note.html") Entry<String, Integer>> notes,
+			@Render("Restaurant-reviews.html") List<Review2> reviews, RelatedRestaurants2 relatedRestaurants)
 			implements Renderer {
 
 		public static Restaurant2 of(Restaurant restaurant, FoodAdvisorClientApp.Persistence persistence) {
@@ -98,7 +98,7 @@ public class RestaurantWeb {
 			return "restaurant";
 		}
 
-		public @Render(template = "Restaurant-stars.html") List<@Render(template = "Restaurant-stars-item.html") Integer> stars() {
+		public @Render("Restaurant-stars.html") List<@Render("Restaurant-stars-item.html") Integer> stars() {
 			return average != null ? IntStream.rangeClosed(1, 5).boxed().toList() : null;
 		}
 
@@ -125,7 +125,7 @@ public class RestaurantWeb {
 		}
 	}
 
-	@Render(template = "Restaurant-review.html")
+	@Render("Restaurant-review.html")
 	public record Review2(@Flatten Review review, User2 author, String timeSummary) implements Renderer {
 
 		public static Review2 of(Review review, Persistence persistence) {
@@ -154,7 +154,7 @@ public class RestaurantWeb {
 			return new Review2(review, User2.of(u, persistence), t);
 		}
 
-		public @Render(template = "Restaurant-stars.html") List<@Render(template = "Restaurant-stars-item.html") Integer> stars() {
+		public @Render("Restaurant-stars.html") List<@Render("Restaurant-stars-item.html") Integer> stars() {
 			return IntStream.rangeClosed(1, 5).boxed().toList();
 		}
 
@@ -168,7 +168,7 @@ public class RestaurantWeb {
 		}
 	}
 
-	public record User2(@Flatten User user, @Render(template = "image.html") Asset picture) {
+	public record User2(@Flatten User user, @Render("image.html") Asset picture) {
 
 		public static User2 of(User user, Persistence persistence) {
 			if (user == null)
@@ -178,7 +178,7 @@ public class RestaurantWeb {
 		}
 	}
 
-	@Render(template = "Restaurant-RelatedRestaurants.html")
+	@Render("Restaurant-RelatedRestaurants.html")
 	public record RelatedRestaurants2(@Flatten Restaurant.RelatedRestaurants relatedRestaurants,
 			List<Restaurant3> restaurants) {
 
@@ -191,8 +191,8 @@ public class RestaurantWeb {
 		}
 	}
 
-	@Render(template = "Restaurant-RelatedRestaurants-item.html")
-	public record Restaurant3(@Flatten Restaurant restaurant, @Render(template = "image.html") Asset image) {
+	@Render("Restaurant-RelatedRestaurants-item.html")
+	public record Restaurant3(@Flatten Restaurant restaurant, @Render("image.html") Asset image) {
 
 		public static Restaurant3 of(Long id, Persistence persistence) {
 			if (id == null)

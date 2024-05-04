@@ -28,6 +28,6 @@ import java.util.Locale;
 
 import com.janilla.web.Render;
 
-@Render(template = "LocalSwitch.html")
-public record LocalSwitch(List<@Render(template = "LocalSwitch-Locale.html") Locale> locales) {
+@Render("LocalSwitch.html")
+public record LocalSwitch(List<@Render("LocalSwitch-Locale.html") Locale> locales) {
 }

@@ -59,6 +59,7 @@ abstract class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 			var ii = p.getCrud(Global.class).list(0, 1).ids();
 			var g = ii.length > 0 ? p.getCrud(Global.class).read(ii[0]) : null;
 			l = new Layout(m, g, input);
+			layout.set(l);
 			input = RenderEngine.Entry.of(null, l, null);
 		}
 		try {

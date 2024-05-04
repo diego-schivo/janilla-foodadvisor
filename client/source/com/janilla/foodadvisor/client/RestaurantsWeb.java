@@ -56,10 +56,10 @@ public class RestaurantsWeb {
 		return Restaurants2.of(s, category, place, page != null ? page : 1, persistence);
 	}
 
-	@Render(template = "Restaurants.html")
+	@Render("Restaurants.html")
 	public record Restaurants2(@Flatten Restaurants restaurants,
-			Collection<@Render(template = "Restaurants-option.html") Category> categories, Long category,
-			Collection<@Render(template = "Restaurants-option.html") Place> places, Long place, List<Restaurant2> items,
+			Collection<@Render("Restaurants-option.html") Category> categories, Long category,
+			Collection<@Render("Restaurants-option.html") Place> places, Long place, List<Restaurant2> items,
 			int page, int lastPage) implements Renderer {
 
 		public static Restaurants2 of(Restaurants restaurants, Long category, Long place, int page,
@@ -86,7 +86,7 @@ public class RestaurantsWeb {
 			return "restaurants";
 		}
 
-		public List<@Render(template = "Restaurants-button.html") Page> pages() {
+		public List<@Render("Restaurants-button.html") Page> pages() {
 			return List.of(new Page(page - 1, "Previous"), new Page(page + 1, "Next"));
 		}
 
@@ -111,8 +111,8 @@ public class RestaurantsWeb {
 		}
 	}
 
-	@Render(template = "Restaurants-item.html")
-	public record Restaurant2(@Flatten Restaurant restaurant, @Render(template = "image.html") Asset image,
+	@Render("Restaurants-item.html")
+	public record Restaurant2(@Flatten Restaurant restaurant, @Render("image.html") Asset image,
 			Category category, Place place) {
 	}
 

@@ -32,9 +32,9 @@ import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Reflection;
 import com.janilla.web.Render;
 
-@Render(template = "Testimonial.html")
+@Render("Testimonial.html")
 public record Testimonial(Map<Locale, String> text,
-		@Reference(User.class) @Render(template = "Testimonial-author.html") Long author) implements Renderer {
+		@Reference(User.class) @Render("Testimonial-author.html") Long author) implements Renderer {
 
 	@Override
 	public boolean evaluate(RenderEngine engine) {

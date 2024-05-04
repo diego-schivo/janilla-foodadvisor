@@ -30,19 +30,19 @@ import com.janilla.foodadvisor.api.Global;
 import com.janilla.foodadvisor.api.Link;
 import com.janilla.web.Render;
 
-@Render(template = "Navbar.html")
+@Render("Navbar.html")
 public record Navbar(Global.Navigation navigation) {
 
-	public @Render(template = "Navbar-Logo.html") Link logo() {
+	public @Render("Navbar-Logo.html") Link logo() {
 		return navigation != null ? navigation.leftButton() : null;
 	}
 
-	public @Render(template = "Navbar-Nav.html") List<Link> nav() {
+	public @Render("Navbar-Nav.html") List<Link> nav() {
 		var ll = navigation != null ? navigation.links() : null;
 		return ll != null && !ll.isEmpty() ? ll : null;
 	}
 
-	public @Render(template = "Navbar-CTA.html") String cta() {
+	public @Render("Navbar-CTA.html") String cta() {
 		return navigation != null && navigation.rightButton() != null ? "cta" : null;
 	}
 

@@ -28,6 +28,6 @@ import java.util.Map;
 
 import com.janilla.web.Render;
 
-@Render(template = "Header.html")
+@Render("Header.html")
 public record Header(Map<Locale, String> label, Map<Locale, String> title) {
 }
