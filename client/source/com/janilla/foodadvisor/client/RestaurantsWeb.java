@@ -47,8 +47,8 @@ public class RestaurantsWeb {
 	public FoodAdvisorClientApp.Persistence persistence;
 
 	@Handle(method = "GET", path = "/restaurants")
-	public Restaurants2 getRestaurants(@Parameter(name = "category") Long category,
-			@Parameter(name = "place") Long place, @Parameter(name = "page") Integer page) {
+	public Restaurants2 getRestaurants(@Parameter("category") Long category,
+			@Parameter("place") Long place, @Parameter("page") Integer page) {
 		var i = persistence.getCrud(Restaurants.class).find("slug", "restaurants");
 		var s = i > 0 ? persistence.getCrud(Restaurants.class).read(i) : null;
 		if (s == null)

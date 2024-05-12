@@ -38,7 +38,7 @@ public class PageWeb {
 
 	@Handle(method = "GET", path = "([/a-z-]*/)([a-z-]*)")
 	public @Render("Page.html") Page getPage(String prefix, String slug,
-			@Parameter(name = "lang") Locale locale, FoodAdvisorClientApp.Exchange exchange) {
+			@Parameter("lang") Locale locale, FoodAdvisorClientApp.Exchange exchange) {
 		if (locale != null)
 			exchange.setLocale(locale);
 		var i = persistence.getCrud(Page.class).find("slug", slug);
