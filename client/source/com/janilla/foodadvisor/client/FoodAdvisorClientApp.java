@@ -108,7 +108,7 @@ public class FoodAdvisorClientApp {
 	public class Server extends HttpServer {
 
 		@Override
-		protected HttpExchange newExchange(HttpRequest request) {
+		protected HttpExchange createExchange(HttpRequest request) {
 			return new Exchange();
 		}
 	}

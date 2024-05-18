@@ -35,9 +35,9 @@ import com.janilla.foodadvisor.api.Restaurants;
 import com.janilla.frontend.RenderEngine;
 import com.janilla.frontend.Renderer;
 import com.janilla.reflect.Flatten;
-import com.janilla.reflect.Parameter;
 import com.janilla.web.Handle;
 import com.janilla.web.NotFoundException;
+import com.janilla.web.Bind;
 import com.janilla.web.Render;
 
 public class RestaurantsWeb {
@@ -47,8 +47,8 @@ public class RestaurantsWeb {
 	public FoodAdvisorClientApp.Persistence persistence;
 
 	@Handle(method = "GET", path = "/restaurants")
-	public Restaurants2 getRestaurants(@Parameter("category") Long category,
-			@Parameter("place") Long place, @Parameter("page") Integer page) {
+	public Restaurants2 getRestaurants(@Bind("category") Long category,
+			@Bind("place") Long place, @Bind("page") Integer page) {
 		var i = persistence.getCrud(Restaurants.class).find("slug", "restaurants");
 		var s = i > 0 ? persistence.getCrud(Restaurants.class).read(i) : null;
 		if (s == null)

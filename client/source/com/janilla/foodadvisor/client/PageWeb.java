@@ -27,9 +27,9 @@ import java.util.Locale;
 
 import com.janilla.foodadvisor.api.Page;
 import com.janilla.persistence.Persistence;
-import com.janilla.reflect.Parameter;
 import com.janilla.web.Handle;
 import com.janilla.web.NotFoundException;
+import com.janilla.web.Bind;
 import com.janilla.web.Render;
 
 public class PageWeb {
@@ -38,7 +38,7 @@ public class PageWeb {
 
 	@Handle(method = "GET", path = "([/a-z-]*/)([a-z-]*)")
 	public @Render("Page.html") Page getPage(String prefix, String slug,
-			@Parameter("lang") Locale locale, FoodAdvisorClientApp.Exchange exchange) {
+			@Bind("lang") Locale locale, FoodAdvisorClientApp.Exchange exchange) {
 		if (locale != null)
 			exchange.setLocale(locale);
 		var i = persistence.getCrud(Page.class).find("slug", slug);
