@@ -23,22 +23,21 @@
  */
 package com.janilla.foodadvisor.api;
 
-import java.io.IOException;
 import java.util.Properties;
 import java.util.function.Supplier;
 
-import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpServer;
-import com.janilla.io.IO;
+import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
 import com.janilla.util.Lazy;
 import com.janilla.util.Util;
+import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.WebHandler;
 
 public class FoodAdvisorApiApp {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		var a = new FoodAdvisorApiApp();
 		{
 			var c = new Properties();
@@ -49,7 +48,7 @@ public class FoodAdvisorApiApp {
 		}
 		a.getPersistence();
 
-		var s = a.new Server();
+		var s = a.getFactory().create(HttpServer.class);
 		s.setPort(Integer.parseInt(a.configuration.getProperty("foodadvisor.api.server.port")));
 		s.setHandler(a.getHandler());
 		s.run();
@@ -57,45 +56,36 @@ public class FoodAdvisorApiApp {
 
 	public Properties configuration;
 
-	private Supplier<Persistence> persistence = Lazy.of(() -> new PersistenceBuilder().build());
+	private Supplier<Factory> factory = Lazy.of(() -> {
+		var f = new Factory();
+		f.setTypes(Util.getPackageClasses(getClass().getPackageName()).toList());
+		f.setSource(this);
+		return f;
+	});
 
-	private Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> new HandlerBuilder().build());
+	private Supplier<Persistence> persistence = Lazy.of(() -> {
+		var b = getFactory().create(ApplicationPersistenceBuilder.class);
+		return b.build();
+	});
+
+	private Supplier<WebHandler> handler = Lazy.of(() -> {
+		var b = getFactory().create(ApplicationHandlerBuilder.class);
+		return b.build();
+	});
+
+	public FoodAdvisorApiApp getApplication() {
+		return this;
+	}
+
+	public Factory getFactory() {
+		return factory.get();
+	}
 
 	public Persistence getPersistence() {
 		return persistence.get();
 	}
 
-	public IO.Consumer<HttpExchange> getHandler() {
+	public WebHandler getHandler() {
 		return handler.get();
-	}
-
-	public class Exchange extends CustomExchange {
-		{
-			configuration = FoodAdvisorApiApp.this.configuration;
-			persistence = getPersistence();
-		}
-	}
-
-	public class HandlerBuilder extends CustomHandlerBuilder {
-//		{
-//			application = FoodAdvisorApiApp.this;
-//		}
-	}
-
-	public class PersistenceBuilder extends CustomPersistenceBuilder {
-		{
-//			application = FoodAdvisorApiApp.this;
-			factory = new Factory();
-			factory.setTypes(Util.getPackageClasses(FoodAdvisorApiApp.class.getPackageName()).toList());
-			factory.setEnclosing(FoodAdvisorApiApp.this);
-		}
-	}
-
-	public class Server extends HttpServer {
-
-		@Override
-		protected HttpExchange createExchange(HttpRequest request) {
-			return new Exchange();
-		}
 	}
 }

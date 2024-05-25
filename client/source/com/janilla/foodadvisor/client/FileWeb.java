@@ -40,7 +40,7 @@ public class FileWeb {
 
 	@Handle(method = "GET", path = "/files/(\\d+)")
 	public void getFile(long id, HttpResponse response) throws IOException {
-		var f = persistence.getCrud(File.class).read(id);
+		var f = persistence.crud(File.class).read(id);
 		if (f == null)
 			throw new NotFoundException();
 		response.setStatus(new Status(200, "OK"));

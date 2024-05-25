@@ -23,41 +23,42 @@
  */
 package com.janilla.foodadvisor.client;
 
-import java.io.IOException;
+import java.util.function.Consumer;
 
 import com.janilla.foodadvisor.api.Global;
 import com.janilla.frontend.RenderEngine;
 import com.janilla.http.HttpExchange;
-import com.janilla.io.IO;
+import com.janilla.persistence.Persistence;
+import com.janilla.reflect.Factory;
 import com.janilla.web.TemplateHandlerFactory;
 
-abstract class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
+public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 
-	public FoodAdvisorClientApp application;
+	public Factory factory;
+
+	public Persistence persistence;
 
 	@Override
-	protected void render(RenderEngine.Entry input, HttpExchange exchange) throws IOException {
+	protected void render(RenderEngine.Entry input, HttpExchange exchange) {
 		applyLayout(input, exchange, x -> super.render(x, exchange));
 	}
 
 	@Override
-	protected RenderEngine newRenderEngine(HttpExchange exchange) {
-		var e = application.new RenderEngine();
-		e.locale = ((FoodAdvisorClientApp.Exchange) exchange).getLocale();
+	protected RenderEngine createRenderEngine(HttpExchange exchange) {
+		var e = (CustomRenderEngine) factory.create(RenderEngine.class);
+		e.locale = ((CustomExchange) exchange).getLocale();
 		return e;
 	}
 
 	static ThreadLocal<Layout> layout = new ThreadLocal<>();
 
-	void applyLayout(RenderEngine.Entry input, HttpExchange exchange, IO.Consumer<RenderEngine.Entry> consumer)
-			throws IOException {
+	void applyLayout(RenderEngine.Entry input, HttpExchange exchange, Consumer<RenderEngine.Entry> consumer) {
 		var l = layout.get();
 		var n = l == null;
 		if (n) {
-			var m = ((FoodAdvisorClientApp.Exchange) exchange).getLocale();
-			var p = application.getPersistence();
-			var ii = p.getCrud(Global.class).list(0, 1).ids();
-			var g = ii.length > 0 ? p.getCrud(Global.class).read(ii[0]) : null;
+			var m = ((CustomExchange) exchange).getLocale();
+			var ii = persistence.crud(Global.class).list(0, 1).ids();
+			var g = ii.length > 0 ? persistence.crud(Global.class).read(ii[0]) : null;
 			l = new Layout(m, g, input);
 			layout.set(l);
 			input = RenderEngine.Entry.of(null, l, null);

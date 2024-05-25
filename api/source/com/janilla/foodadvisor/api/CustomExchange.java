@@ -33,11 +33,11 @@ import com.janilla.persistence.Persistence;
 import com.janilla.util.Lazy;
 import com.janilla.web.UnauthenticatedException;
 
-abstract class CustomExchange extends HttpExchange {
+public class CustomExchange extends HttpExchange {
 
-	Properties configuration;
+	public Properties configuration;
 
-	Persistence persistence;
+	public Persistence persistence;
 
 	private Supplier<User> user = Lazy.of(() -> {
 		var a = getRequest().getHeaders().get("Authorization");
@@ -49,7 +49,7 @@ abstract class CustomExchange extends HttpExchange {
 			p = null;
 		}
 		var e = p != null ? (String) p.get("sub") : null;
-		var c = persistence.getCrud(User.class);
+		var c = persistence.crud(User.class);
 		var i = e != null ? c.find("email", e) : 0;
 		var u = i > 0 ? c.read(i) : null;
 		return u;

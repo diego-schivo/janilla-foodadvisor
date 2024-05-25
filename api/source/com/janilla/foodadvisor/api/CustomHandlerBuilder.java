@@ -26,7 +26,7 @@ package com.janilla.foodadvisor.api;
 import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.MethodHandlerFactory;
 
-abstract class CustomHandlerBuilder extends ApplicationHandlerBuilder {
+public class CustomHandlerBuilder extends ApplicationHandlerBuilder {
 
 	@Override
 	protected MethodHandlerFactory buildMethodHandlerFactory() {

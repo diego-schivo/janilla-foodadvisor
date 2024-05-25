@@ -23,34 +23,28 @@
  */
 package com.janilla.foodadvisor.client;
 
-import java.util.Locale;
-import java.util.function.Supplier;
+import java.util.Properties;
 
-import com.janilla.http.Http;
 import com.janilla.http.HttpExchange;
-import com.janilla.util.Lazy;
+import com.janilla.web.HandleException;
+import com.janilla.web.MethodHandlerFactory;
+import com.janilla.web.MethodInvocation;
 
-public class CustomExchange extends HttpExchange {
+public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
-	protected Locale locale;
+	public Properties configuration;
 
-	protected Supplier<Locale> cookieLocale = Lazy.of(() -> {
-		var hh = getRequest().getHeaders();
-		var h = hh != null ? hh.get("Cookie") : null;
-		var cc = h != null ? Http.parseCookieHeader(h) : null;
-		var s = cc != null ? cc.get("lang") : null;
-		return s != null ? Locale.forLanguageTag(s) : Locale.ENGLISH;
-	});
-
-	public Locale getLocale() {
-		return locale != null ? locale : cookieLocale.get();
-	}
-
-	public void setLocale(Locale locale) {
-		if (this.locale != null)
-			throw new IllegalStateException();
-		this.locale = locale;
-		getResponse().getHeaders().add("Set-Cookie",
-				Http.formatSetCookieHeader("lang", locale.toLanguageTag(), null, "/", "strict"));
+	@Override
+	protected void handle(MethodInvocation invocation, HttpExchange exchange) {
+		if (Boolean.parseBoolean(configuration.getProperty("foodadvisor.live-demo"))) {
+			var q = exchange.getRequest();
+			switch (q.getMethod().name()) {
+			case "GET":
+				break;
+			default:
+				throw new HandleException(new MethodBlockedException());
+			}
+		}
+		super.handle(invocation, exchange);
 	}
 }

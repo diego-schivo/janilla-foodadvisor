@@ -54,12 +54,12 @@ import com.janilla.reflect.Reflection;
 import com.janilla.util.Randomize;
 import com.janilla.util.Util;
 
-public abstract class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
+public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 
 	@Override
 	public Persistence build() {
 		if (file == null) {
-			var a = factory.getEnclosing();
+			var a = factory.getSource();
 			var c = (Properties) Reflection.property(a.getClass(), "configuration").get(a);
 			var p = c.getProperty("foodadvisor.database.file");
 			if (p.startsWith("~"))
@@ -79,11 +79,6 @@ public abstract class CustomPersistenceBuilder extends ApplicationPersistenceBui
 			seed(p);
 		return p;
 	}
-
-//	@Override
-//	protected Stream<String> getPackageNames() {
-//		return Stream.concat(super.getPackageNames(), Stream.of("com.janilla.foodadvisor.api")).distinct();
-//	}
 
 	static Random random = new SecureRandom();
 
@@ -121,21 +116,20 @@ public abstract class CustomPersistenceBuilder extends ApplicationPersistenceBui
 	static void seed(Persistence persistence) {
 		var r = ThreadLocalRandom.current();
 
-		persistence.getCrud(User.class).create(
+		persistence.crud(User.class).create(
 				setHashAndSalt(new User(null, null, "admin@example.com", null, null, null, null), "Password1!"));
 
-//		for (var n : Randomize.elements(10, 15, w).distinct().toList()) {
-		for (var n : Randomize.elements(3, 4, w).distinct().toList()) {
+		for (var n : Randomize.elements(1, 2, w).distinct().toList()) {
 			var o = Randomize.element(w);
 
 			var p = Randomize.phrase(2, 4, () -> Randomize.element(w)).replace(' ', '-') + ".jpg";
 			var bb = getRandomImage("150x150", "avatar");
-			var f = persistence.getCrud(File.class).create(new File(null, p, bb));
-			var a = persistence.getCrud(Asset.class).create(new Asset(null, f.id()));
+			var f = persistence.crud(File.class).create(new File(null, p, bb));
+			var a = persistence.crud(Asset.class).create(new Asset(null, f.id()));
 
 			var u = setHashAndSalt(new User(null, Util.capitalizeFirstChar(n) + " " + Util.capitalizeFirstChar(o),
 					n + "@" + o + ".com", null, null, a.id(), null), n);
-			persistence.getCrud(User.class).create(u);
+			persistence.crud(User.class).create(u);
 		}
 
 		{
@@ -144,15 +138,15 @@ public abstract class CustomPersistenceBuilder extends ApplicationPersistenceBui
 					new Link(URI.create("/"), Map.of(Locale.ENGLISH, "FoodAdvisor")),
 					new Link(URI.create("https://janilla.com"), Map.of(Locale.ENGLISH, "Get Started with Janilla")));
 			var f = new Global.Footer(Map.of(Locale.ENGLISH, "Made with Janilla"));
-			persistence.getCrud(Global.class).create(new Global(null, n, f));
+			persistence.crud(Global.class).create(new Global(null, n, f));
 		}
 
 		{
 			var ii = IntStream.range(0, 4).mapToLong(x -> {
 				var n = Randomize.phrase(2, 4, () -> Randomize.element(w)).replace(' ', '-') + ".jpg";
 				var bb = getRandomImage(x > 0 && x < 3 ? "300x450" : "450x300", "food");
-				var f = persistence.getCrud(File.class).create(new File(null, n, bb));
-				var a = persistence.getCrud(Asset.class).create(new Asset(null, f.id()));
+				var f = persistence.crud(File.class).create(new File(null, n, bb));
+				var a = persistence.crud(Asset.class).create(new Asset(null, f.id()));
 				return a.id();
 			}).boxed().toList();
 			var t = Map.of(Locale.ENGLISH,
@@ -161,7 +155,7 @@ public abstract class CustomPersistenceBuilder extends ApplicationPersistenceBui
 					"Janilla FoodAdvisor is a clone of the Strapi demo app listing restaurants around the world.");
 			var bb = List.of(new Link(URI.create("/restaurants"), Map.of(Locale.ENGLISH, "Browse restaurants")));
 			var h = new Hero(ii, t, u, bb);
-			persistence.getCrud(Page.class).create(new Page(null, "Homepage", "", List.of(h)));
+			persistence.crud(Page.class).create(new Page(null, "Homepage", "", List.of(h)));
 		}
 
 		{
@@ -170,29 +164,28 @@ public abstract class CustomPersistenceBuilder extends ApplicationPersistenceBui
 							Util.capitalizeFirstChar(Randomize.phrase(3, 6, () -> Randomize.element(w)))),
 					Map.of(Locale.ENGLISH,
 							Util.capitalizeFirstChar(Randomize.phrase(2, 4, () -> Randomize.element(w)))));
-			persistence.getCrud(Restaurants.class).create(new Restaurants(null, "restaurants", h));
+			persistence.crud(Restaurants.class).create(new Restaurants(null, "restaurants", h));
 		}
 
 		for (var n : Randomize.elements(5, 15, w).distinct().map(Util::capitalizeFirstChar).toList())
-			persistence.getCrud(Category.class).create(new Category(null, n));
+			persistence.crud(Category.class).create(new Category(null, n));
 
 		for (var n : Randomize.elements(5, 15, w).distinct().map(Util::capitalizeFirstChar).toList())
-			persistence.getCrud(Place.class).create(new Place(null, n));
+			persistence.crud(Place.class).create(new Place(null, n));
 
-//		for (var i = r.nextInt(13, 25); i > 0; i--) {
-		for (var i = r.nextInt(3, 4); i > 0; i--) {
+		for (var i = r.nextInt(1, 2); i > 0; i--) {
 			var n1 = Util.capitalizeFirstChar(Randomize.phrase(2, 4, () -> Randomize.element(w)));
 			var s1 = n1.toLowerCase().replace(' ', '-');
 
-			var ii1 = IntStream.range(0, r.nextInt(3, 7)).mapToLong(x -> {
+			var ii1 = IntStream.range(0, r.nextInt(2, 3)).mapToLong(x -> {
 				var n = Randomize.phrase(2, 4, () -> Randomize.element(w)).replace(' ', '-') + ".jpg";
 				var bb = getRandomImage(r.nextBoolean() ? "450x675" : "675x450", "food");
-				var f = persistence.getCrud(File.class).create(new File(null, n, bb));
-				var a = persistence.getCrud(Asset.class).create(new Asset(null, f.id()));
+				var f = persistence.crud(File.class).create(new File(null, n, bb));
+				var a = persistence.crud(Asset.class).create(new Asset(null, f.id()));
 				return a.id();
 			}).boxed().toList();
-			var c1 = r.nextLong(1, persistence.getCrud(Category.class).count() + 1);
-			var p1 = r.nextLong(1, persistence.getCrud(Place.class).count() + 1);
+			var c1 = r.nextLong(1, persistence.crud(Category.class).count() + 1);
+			var p1 = r.nextLong(1, persistence.crud(Place.class).count() + 1);
 			var q1 = r.nextInt(1, 5);
 			var d = Map.of(Locale.ENGLISH, Randomize.sentence(20, 30, () -> Randomize.element(w)));
 			var hh = IntStream.range(0, r.nextInt(1, 4)).mapToObj(
@@ -202,7 +195,7 @@ public abstract class CustomPersistenceBuilder extends ApplicationPersistenceBui
 			var i1 = new Restaurant.Information(d, hh, l);
 			Restaurant.RelatedRestaurants rr1;
 			{
-				var c = persistence.getCrud(Restaurant.class).count();
+				var c = persistence.crud(Restaurant.class).count();
 				if (c > 0) {
 					var h = new Header(
 							Map.of(Locale.ENGLISH,
@@ -214,15 +207,15 @@ public abstract class CustomPersistenceBuilder extends ApplicationPersistenceBui
 				} else
 					rr1 = null;
 			}
-			var s = persistence.getCrud(Restaurant.class)
+			var s = persistence.crud(Restaurant.class)
 					.create(new Restaurant(null, n1, s1, ii1, c1, p1, q1, i1, rr1));
 
-			for (var j = r.nextInt(6); j > 0; j--) {
+			for (var j = r.nextInt(1, 2); j > 0; j--) {
 				var t = Randomize.instant(Instant.parse("2020-01-01T00:00:00.00Z"), Instant.now());
 				var c = Randomize.sentence(20, 30, () -> Randomize.element(w));
 				var n = r.nextInt(1, 6);
-				var a = r.nextLong(2, persistence.getCrud(User.class).count() + 1);
-				persistence.getCrud(Review.class).create(new Review(null, t, c, n, a, s.id()));
+				var a = r.nextLong(2, persistence.crud(User.class).count() + 1);
+				persistence.crud(Review.class).create(new Review(null, t, c, n, a, s.id()));
 			}
 		}
 	}

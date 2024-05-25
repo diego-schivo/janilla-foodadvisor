@@ -33,6 +33,6 @@ import com.janilla.web.Render;
 public record Gallery(List<@Render("Gallery-image.html") Asset> images) {
 
 	public static Gallery of(List<Long> images, Persistence persistence) {
-		return new Gallery(images.stream().map(x -> persistence.getCrud(Asset.class).read(x)).toList());
+		return new Gallery(images.stream().map(x -> persistence.crud(Asset.class).read(x)).toList());
 	}
 }

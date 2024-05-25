@@ -34,7 +34,7 @@ class Login {
 	listen = () => {
 		this.selector().querySelector('form').addEventListener('submit', this.handleFormSubmit);
 	}
-	
+
 	handleFormSubmit = async event => {
 		event.preventDefault();
 		const d = new FormData(event.currentTarget);
@@ -43,6 +43,8 @@ class Login {
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify(Object.fromEntries(d))
 		});
+		if (!s.ok)
+			alert(await s.text());
 		const j = await s.json();
 		this.selector().dispatchEvent(new CustomEvent('login', {
 			bubbles: true,

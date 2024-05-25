@@ -23,99 +23,73 @@
  */
 package com.janilla.foodadvisor.client;
 
-import java.io.IOException;
 import java.util.Properties;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
-import com.janilla.foodadvisor.api.CustomPersistenceBuilder;
-import com.janilla.foodadvisor.api.FoodAdvisorApiApp;
-import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpRequest;
 import com.janilla.http.HttpServer;
-import com.janilla.io.IO;
+import com.janilla.persistence.ApplicationPersistenceBuilder;
+import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
 import com.janilla.util.Lazy;
 import com.janilla.util.Util;
+import com.janilla.web.ApplicationHandlerBuilder;
+import com.janilla.web.WebHandler;
 
 public class FoodAdvisorClientApp {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		var a = new FoodAdvisorClientApp();
 		{
 			var c = new Properties();
 			try (var s = a.getClass().getResourceAsStream("configuration.properties")) {
 				c.load(s);
 			}
-			a.setConfiguration(c);
+			a.configuration = c;
 		}
 		a.getPersistence();
 
-		var s = a.new Server();
-		s.setPort(Integer.parseInt(a.getConfiguration().getProperty("foodadvisor.client.server.port")));
+		var s = a.getFactory().create(HttpServer.class);
+		s.setPort(Integer.parseInt(a.configuration.getProperty("foodadvisor.client.server.port")));
 		s.setHandler(a.getHandler());
 		s.run();
 	}
 
-	private Properties configuration;
+	public Properties configuration;
 
-	private Supplier<Persistence> persistence = Lazy.of(() -> (Persistence) new PersistenceBuilder().build());
+	private Supplier<Factory> factory = Lazy.of(() -> {
+		var f = new Factory();
+		f.setTypes(Stream.concat(Util.getPackageClasses(getClass().getPackageName()),
+				Util.getPackageClasses("com.janilla.foodadvisor.api")
+						.filter(x -> !x.getSimpleName().equals("CustomMethodHandlerFactory")))
+				.toList());
+		f.setSource(this);
+		return f;
+	});
 
-	private Supplier<IO.Consumer<HttpExchange>> handler = Lazy.of(() -> new HandlerBuilder().build());
+	private Supplier<Persistence> persistence = Lazy.of(() -> {
+		var b = getFactory().create(ApplicationPersistenceBuilder.class);
+		return b.build();
+	});
 
-	public Properties getConfiguration() {
-		return configuration;
+	private Supplier<WebHandler> handler = Lazy.of(() -> {
+		var b = getFactory().create(ApplicationHandlerBuilder.class);
+		return b.build();
+	});
+
+	public FoodAdvisorClientApp getApplication() {
+		return this;
 	}
 
-	public void setConfiguration(Properties configuration) {
-		this.configuration = configuration;
+	public Factory getFactory() {
+		return factory.get();
 	}
 
 	public Persistence getPersistence() {
 		return persistence.get();
 	}
 
-	public IO.Consumer<HttpExchange> getHandler() {
+	public WebHandler getHandler() {
 		return handler.get();
-	}
-
-	public class Exchange extends CustomExchange {
-	}
-
-	public class HandlerBuilder extends CustomHandlerBuilder {
-//		{
-//			application = FoodAdvisorClientApp.this;
-//		}
-	}
-
-	public class Persistence extends CustomPersistence {
-	}
-
-	public class PersistenceBuilder extends CustomPersistenceBuilder {
-		{
-//			application = FoodAdvisorClientApp.this;
-			factory = new Factory();
-			factory.setTypes(Util.getPackageClasses(FoodAdvisorApiApp.class.getPackageName()).toList());
-			factory.setEnclosing(FoodAdvisorClientApp.this);
-		}
-	}
-
-	public class RenderEngine extends CustomRenderEngine {
-		{
-			persistence = FoodAdvisorClientApp.this.getPersistence();
-		}
-	}
-
-	public class Server extends HttpServer {
-
-		@Override
-		protected HttpExchange createExchange(HttpRequest request) {
-			return new Exchange();
-		}
-	}
-
-	public class TemplateHandlerFactory extends CustomTemplateHandlerFactory {
-		{
-			application = FoodAdvisorClientApp.this;
-		}
 	}
 }

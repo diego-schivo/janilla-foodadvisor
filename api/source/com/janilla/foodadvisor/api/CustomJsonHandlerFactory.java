@@ -21,36 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.janilla.foodadvisor.client;
+package com.janilla.foodadvisor.api;
 
-import java.util.Locale;
-import java.util.function.Supplier;
+import java.util.Iterator;
 
-import com.janilla.http.Http;
 import com.janilla.http.HttpExchange;
-import com.janilla.util.Lazy;
+import com.janilla.json.JsonToken;
+import com.janilla.json.ReflectionJsonIterator;
+import com.janilla.web.JsonHandlerFactory;
 
-public class CustomExchange extends HttpExchange {
+public class CustomJsonHandlerFactory extends JsonHandlerFactory {
 
-	protected Locale locale;
-
-	protected Supplier<Locale> cookieLocale = Lazy.of(() -> {
-		var hh = getRequest().getHeaders();
-		var h = hh != null ? hh.get("Cookie") : null;
-		var cc = h != null ? Http.parseCookieHeader(h) : null;
-		var s = cc != null ? cc.get("lang") : null;
-		return s != null ? Locale.forLanguageTag(s) : Locale.ENGLISH;
-	});
-
-	public Locale getLocale() {
-		return locale != null ? locale : cookieLocale.get();
-	}
-
-	public void setLocale(Locale locale) {
-		if (this.locale != null)
-			throw new IllegalStateException();
-		this.locale = locale;
-		getResponse().getHeaders().add("Set-Cookie",
-				Http.formatSetCookieHeader("lang", locale.toLanguageTag(), null, "/", "strict"));
+	@Override
+	protected Iterator<JsonToken<?>> buildJsonIterator(Object object, HttpExchange exchange) {
+		var i = super.buildJsonIterator(object, exchange);
+		((ReflectionJsonIterator) i).setIncludeType(true);
+		return i;
 	}
 }

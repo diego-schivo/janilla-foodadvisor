@@ -23,34 +23,18 @@
  */
 package com.janilla.foodadvisor.client;
 
-import java.util.Locale;
-import java.util.function.Supplier;
+import com.janilla.web.Error;
+import com.janilla.web.Render;
 
-import com.janilla.http.Http;
-import com.janilla.http.HttpExchange;
-import com.janilla.util.Lazy;
+@Error(code = 403, text = "Forbidden")
+@Render("""
+		{message}
+		""")
+public class MethodBlockedException extends RuntimeException {
 
-public class CustomExchange extends HttpExchange {
+	private static final long serialVersionUID = 1328692475014901717L;
 
-	protected Locale locale;
-
-	protected Supplier<Locale> cookieLocale = Lazy.of(() -> {
-		var hh = getRequest().getHeaders();
-		var h = hh != null ? hh.get("Cookie") : null;
-		var cc = h != null ? Http.parseCookieHeader(h) : null;
-		var s = cc != null ? cc.get("lang") : null;
-		return s != null ? Locale.forLanguageTag(s) : Locale.ENGLISH;
-	});
-
-	public Locale getLocale() {
-		return locale != null ? locale : cookieLocale.get();
-	}
-
-	public void setLocale(Locale locale) {
-		if (this.locale != null)
-			throw new IllegalStateException();
-		this.locale = locale;
-		getResponse().getHeaders().add("Set-Cookie",
-				Http.formatSetCookieHeader("lang", locale.toLanguageTag(), null, "/", "strict"));
+	public MethodBlockedException() {
+		super("The requested action is disabled on this public server: please set up and run the application locally");
 	}
 }

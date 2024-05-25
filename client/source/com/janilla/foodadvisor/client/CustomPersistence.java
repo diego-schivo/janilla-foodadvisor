@@ -30,16 +30,16 @@ import com.janilla.foodadvisor.api.Category;
 import com.janilla.foodadvisor.api.Place;
 import com.janilla.persistence.Persistence;
 
-abstract class CustomPersistence extends Persistence {
+public class CustomPersistence extends Persistence {
 
 	public Map<Long, Category> getCategories() {
-		var c = getCrud(Category.class);
+		var c = crud(Category.class);
 		var s = c.read(c.list());
 		return s.collect(Collectors.toMap(x -> x.id(), x -> x));
 	}
 
 	public Map<Long, Place> getPlaces() {
-		var c = getCrud(Place.class);
+		var c = crud(Place.class);
 		var s = c.read(c.list());
 		return s.collect(Collectors.toMap(x -> x.id(), x -> x));
 	}

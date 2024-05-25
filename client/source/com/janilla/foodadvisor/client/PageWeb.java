@@ -27,9 +27,9 @@ import java.util.Locale;
 
 import com.janilla.foodadvisor.api.Page;
 import com.janilla.persistence.Persistence;
+import com.janilla.web.Bind;
 import com.janilla.web.Handle;
 import com.janilla.web.NotFoundException;
-import com.janilla.web.Bind;
 import com.janilla.web.Render;
 
 public class PageWeb {
@@ -37,12 +37,12 @@ public class PageWeb {
 	public Persistence persistence;
 
 	@Handle(method = "GET", path = "([/a-z-]*/)([a-z-]*)")
-	public @Render("Page.html") Page getPage(String prefix, String slug,
-			@Bind("lang") Locale locale, FoodAdvisorClientApp.Exchange exchange) {
+	public @Render("Page.html") Page getPage(String prefix, String slug, @Bind("lang") Locale locale,
+			CustomExchange exchange) {
 		if (locale != null)
 			exchange.setLocale(locale);
-		var i = persistence.getCrud(Page.class).find("slug", slug);
-		var p = i > 0 ? persistence.getCrud(Page.class).read(i) : null;
+		var i = persistence.crud(Page.class).find("slug", slug);
+		var p = i > 0 ? persistence.crud(Page.class).read(i) : null;
 		if (p == null)
 			throw new NotFoundException();
 		return p;

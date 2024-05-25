@@ -23,17 +23,29 @@
  */
 package com.janilla.foodadvisor.api;
 
-import java.io.IOException;
+import java.util.Properties;
 
 import com.janilla.http.HttpExchange;
+import com.janilla.web.HandleException;
 import com.janilla.web.MethodHandlerFactory;
 import com.janilla.web.MethodInvocation;
 
 public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
+	public Properties configuration;
+
 	@Override
-	protected void handle(MethodInvocation invocation, HttpExchange exchange) throws IOException {
-		var e = (FoodAdvisorApiApp.Exchange) exchange;
+	protected void handle(MethodInvocation invocation, HttpExchange exchange) {
+		if (Boolean.parseBoolean(configuration.getProperty("foodadvisor.live-demo"))) {
+			var q = exchange.getRequest();
+			switch (q.getMethod().name()) {
+			case "GET":
+				break;
+			default:
+				throw new HandleException(new MethodBlockedException());
+			}
+		}
+		var e = (CustomExchange) exchange;
 		var q = e.getRequest();
 		var p = q.getURI().getPath();
 		if (q.getMethod().name().equals("GET") && (p.equals("/admin") || p.equals("/templates.js")))

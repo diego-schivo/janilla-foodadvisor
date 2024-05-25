@@ -53,15 +53,17 @@ public class AdminWeb {
 
 	@Handle(method = "POST", path = "/admin/login")
 	public String login(Credential credential) {
-		var i = persistence.getCrud(User.class).find("email", credential.email);
-		var u = i > 0 ? persistence.getCrud(User.class).read(i) : null;
-		{
+		var i = persistence.crud(User.class).find("email", credential.email);
+		var u = i > 0 ? persistence.crud(User.class).read(i) : null;
+		if (u != null) {
 			var f = HexFormat.of();
 			var h = f.formatHex(
 					CustomPersistenceBuilder.hash(credential.password.toCharArray(), f.parseHex(u.passwordSalt())));
 			if (!h.equals(u.passwordHash()))
 				u = null;
 		}
+		if (u == null)
+			throw new IllegalArgumentException();
 		var h = Map.of("alg", "HS256", "typ", "JWT");
 		var p = Map.of("sub", u.email());
 		var t = Jwt.generateToken(h, p, configuration.getProperty("foodadvisor.jwt.key"));
@@ -88,7 +90,7 @@ public class AdminWeb {
 				.map(x -> x.startsWith("\"") && x.endsWith("\"") ? x.substring(1, x.length() - 1) : x).findFirst()
 				.orElseThrow();
 		bb = Arrays.copyOfRange(bb, i + 4, bb.length);
-		return persistence.getCrud(File.class).create(new File(null, n, bb)).id();
+		return persistence.crud(File.class).create(new File(null, n, bb)).id();
 	}
 
 	public record Credential(String email, String password) {

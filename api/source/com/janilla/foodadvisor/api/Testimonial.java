@@ -27,22 +27,22 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
+import com.janilla.frontend.RenderParticipant;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Reflection;
 import com.janilla.web.Render;
 
 @Render("Testimonial.html")
 public record Testimonial(Map<Locale, String> text,
-		@Reference(User.class) @Render("Testimonial-author.html") Long author) implements Renderer {
+		@Reference(User.class) @Render("Testimonial-author.html") Long author) implements RenderParticipant {
 
 	@Override
-	public boolean evaluate(RenderEngine engine) {
+	public boolean render(RenderEngine engine) {
 		record A(Testimonial testimonial, Long author) {
 		}
 		return engine.match(A.class, (i, o) -> {
 			var p = (Persistence) Reflection.property(engine.getClass(), "persistence").get(engine);
-			var u = p.getCrud(User.class).read(i.author);
+			var u = p.crud(User.class).read(i.author);
 			o.setValue(u);
 		});
 	}

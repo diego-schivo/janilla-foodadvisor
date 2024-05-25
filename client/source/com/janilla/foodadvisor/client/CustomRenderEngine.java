@@ -31,7 +31,7 @@ import java.util.Map;
 import com.janilla.frontend.RenderEngine;
 import com.janilla.persistence.Persistence;
 
-abstract class CustomRenderEngine extends RenderEngine {
+public class CustomRenderEngine extends RenderEngine {
 
 	Persistence persistence;
 
@@ -45,8 +45,12 @@ abstract class CustomRenderEngine extends RenderEngine {
 				if (type instanceof AnnotatedParameterizedType t) {
 					var aa = t.getAnnotatedActualTypeArguments();
 					if (aa.length == 2 && aa[0].getType() == Locale.class) {
-						value = m.containsKey(locale) ? m.get(locale)
-								: !locale.equals(Locale.ENGLISH) ? m.get(Locale.ENGLISH) : null;
+//						value = m.containsKey(locale) ? m.get(locale)
+//								: !locale.equals(Locale.ENGLISH) ? m.get(Locale.ENGLISH) : null;
+						value = m.get(locale);
+						if (!locale.equals(Locale.ENGLISH)
+								&& (value == null || (value instanceof String s && s.isEmpty())))
+							value = m.get(Locale.ENGLISH);
 						type = aa[1];
 					}
 				}

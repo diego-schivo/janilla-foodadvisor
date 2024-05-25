@@ -38,7 +38,7 @@ import com.janilla.foodadvisor.api.Restaurant;
 import com.janilla.foodadvisor.api.Review;
 import com.janilla.foodadvisor.api.User;
 import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
+import com.janilla.frontend.RenderParticipant;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Flatten;
 import com.janilla.web.Handle;
@@ -49,12 +49,12 @@ public class RestaurantWeb {
 
 	private static DecimalFormat noteFormatter = new DecimalFormat("0.#");
 
-	public FoodAdvisorClientApp.Persistence persistence;
+	public Persistence persistence;
 
 	@Handle(method = "GET", path = "/restaurants/([a-z-]+)")
 	public Restaurant2 getRestaurant(String slug) {
-		var i = persistence.getCrud(Restaurant.class).find("slug", slug);
-		var r = i > 0 ? persistence.getCrud(Restaurant.class).read(i) : null;
+		var i = persistence.crud(Restaurant.class).find("slug", slug);
+		var r = i > 0 ? persistence.crud(Restaurant.class).read(i) : null;
 		if (r == null)
 			throw new NotFoundException();
 		return Restaurant2.of(r, persistence);
@@ -65,15 +65,15 @@ public class RestaurantWeb {
 			String price, Double average,
 			List<Map.@Render("Restaurant-note.html") Entry<String, Integer>> notes,
 			@Render("Restaurant-reviews.html") List<Review2> reviews, RelatedRestaurants2 relatedRestaurants)
-			implements Renderer {
+			implements RenderParticipant {
 
-		public static Restaurant2 of(Restaurant restaurant, FoodAdvisorClientApp.Persistence persistence) {
+		public static Restaurant2 of(Restaurant restaurant, Persistence persistence) {
 			if (restaurant == null)
 				return null;
-			var cc = persistence.getCategories();
+			var cc = ((CustomPersistence) persistence).getCategories();
 			var c = cc.get(restaurant.category());
-			var ii = persistence.getCrud(Review.class).filter("restaurant", restaurant.id());
-			var rr = persistence.getCrud(Review.class).read(ii).toList();
+			var ii = persistence.crud(Review.class).filter("restaurant", restaurant.id());
+			var rr = persistence.crud(Review.class).read(ii).toList();
 			var s = switch (rr.size()) {
 			case 0 -> null;
 			case 1 -> "1 Review";
@@ -107,7 +107,7 @@ public class RestaurantWeb {
 		}
 
 		@Override
-		public boolean evaluate(RenderEngine engine) {
+		public boolean render(RenderEngine engine) {
 			record A(Integer note, Object fill) {
 			}
 			record B(Restaurant.Location location, Object items) {
@@ -126,12 +126,12 @@ public class RestaurantWeb {
 	}
 
 	@Render("Restaurant-review.html")
-	public record Review2(@Flatten Review review, User2 author, String timeSummary) implements Renderer {
+	public record Review2(@Flatten Review review, User2 author, String timeSummary) implements RenderParticipant {
 
 		public static Review2 of(Review review, Persistence persistence) {
 			if (review == null)
 				return null;
-			var u = persistence.getCrud(User.class).read(review.author());
+			var u = persistence.crud(User.class).read(review.author());
 			var d = Duration.between(review.creationTime(), Instant.now());
 			var l = d.toDaysPart();
 			String t;
@@ -159,7 +159,7 @@ public class RestaurantWeb {
 		}
 
 		@Override
-		public boolean evaluate(RenderEngine engine) {
+		public boolean render(RenderEngine engine) {
 			record A(Integer note, Object fill) {
 			}
 			return engine.match(A.class, (i, o) -> {
@@ -173,7 +173,7 @@ public class RestaurantWeb {
 		public static User2 of(User user, Persistence persistence) {
 			if (user == null)
 				return null;
-			var p = persistence.getCrud(Asset.class).read(user.picture());
+			var p = persistence.crud(Asset.class).read(user.picture());
 			return new User2(user, p);
 		}
 	}
@@ -197,8 +197,8 @@ public class RestaurantWeb {
 		public static Restaurant3 of(Long id, Persistence persistence) {
 			if (id == null)
 				return null;
-			var r = persistence.getCrud(Restaurant.class).read(id);
-			return new Restaurant3(r, persistence.getCrud(Asset.class).read(r.images().get(0)));
+			var r = persistence.crud(Restaurant.class).read(id);
+			return new Restaurant3(r, persistence.crud(Asset.class).read(r.images().get(0)));
 		}
 	}
 }

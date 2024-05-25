@@ -28,18 +28,18 @@ import java.util.Locale;
 import com.janilla.foodadvisor.api.Global;
 import com.janilla.foodadvisor.api.Link;
 import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
+import com.janilla.frontend.RenderParticipant;
 import com.janilla.web.Render;
 
 @Render("Layout.html")
-public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements Renderer {
+public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements RenderParticipant {
 
 	public Navbar navbar() {
 		return global != null ? new Navbar(global.navigation()) : null;
 	}
 
 	@Override
-	public boolean evaluate(RenderEngine engine) {
+	public boolean render(RenderEngine engine) {
 		record A(Layout layout, Object content) {
 		}
 		record B(Link link, Object target) {

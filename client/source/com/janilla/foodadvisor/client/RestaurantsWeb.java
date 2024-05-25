@@ -33,24 +33,25 @@ import com.janilla.foodadvisor.api.Place;
 import com.janilla.foodadvisor.api.Restaurant;
 import com.janilla.foodadvisor.api.Restaurants;
 import com.janilla.frontend.RenderEngine;
-import com.janilla.frontend.Renderer;
+import com.janilla.frontend.RenderParticipant;
+import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Flatten;
+import com.janilla.web.Bind;
 import com.janilla.web.Handle;
 import com.janilla.web.NotFoundException;
-import com.janilla.web.Bind;
 import com.janilla.web.Render;
 
 public class RestaurantsWeb {
 
 	public static int PAGE_SIZE = 12;
 
-	public FoodAdvisorClientApp.Persistence persistence;
+	public Persistence persistence;
 
 	@Handle(method = "GET", path = "/restaurants")
-	public Restaurants2 getRestaurants(@Bind("category") Long category,
-			@Bind("place") Long place, @Bind("page") Integer page) {
-		var i = persistence.getCrud(Restaurants.class).find("slug", "restaurants");
-		var s = i > 0 ? persistence.getCrud(Restaurants.class).read(i) : null;
+	public Restaurants2 getRestaurants(@Bind("category") Long category, @Bind("place") Long place,
+			@Bind("page") Integer page) {
+		var i = persistence.crud(Restaurants.class).find("slug", "restaurants");
+		var s = i > 0 ? persistence.crud(Restaurants.class).read(i) : null;
 		if (s == null)
 			throw new NotFoundException();
 		return Restaurants2.of(s, category, place, page != null ? page : 1, persistence);
@@ -59,21 +60,21 @@ public class RestaurantsWeb {
 	@Render("Restaurants.html")
 	public record Restaurants2(@Flatten Restaurants restaurants,
 			Collection<@Render("Restaurants-option.html") Category> categories, Long category,
-			Collection<@Render("Restaurants-option.html") Place> places, Long place, List<Restaurant2> items,
-			int page, int lastPage) implements Renderer {
+			Collection<@Render("Restaurants-option.html") Place> places, Long place, List<Restaurant2> items, int page,
+			int lastPage) implements RenderParticipant {
 
 		public static Restaurants2 of(Restaurants restaurants, Long category, Long place, int page,
-				FoodAdvisorClientApp.Persistence persistence) {
+				Persistence persistence) {
 			var m = new HashMap<String, Object[]>();
 			if (category != null)
 				m.put("category", new Object[] { category });
 			if (place != null)
 				m.put("place", new Object[] { place });
-			var p = persistence.getCrud(Restaurant.class).filter(m, (page - 1) * PAGE_SIZE, PAGE_SIZE);
-			var cc = persistence.getCategories();
-			var pp = persistence.getPlaces();
-			var rr = persistence.getCrud(Restaurant.class).read(p.ids()).map(r -> {
-				var j = persistence.getCrud(Asset.class).read(r.images().get(0));
+			var p = persistence.crud(Restaurant.class).filter(m, (page - 1) * PAGE_SIZE, PAGE_SIZE);
+			var cc = ((CustomPersistence) persistence).getCategories();
+			var pp = ((CustomPersistence) persistence).getPlaces();
+			var rr = persistence.crud(Restaurant.class).read(p.ids()).map(r -> {
+				var j = persistence.crud(Asset.class).read(r.images().get(0));
 				var c = cc.get(r.category());
 				var q = pp.get(r.place());
 				return new Restaurant2(r, j, c, q);
@@ -91,7 +92,7 @@ public class RestaurantsWeb {
 		}
 
 		@Override
-		public boolean evaluate(RenderEngine engine) {
+		public boolean render(RenderEngine engine) {
 			record A(Category category, Object selected) {
 			}
 			record B(Place place, Object selected) {
@@ -112,8 +113,8 @@ public class RestaurantsWeb {
 	}
 
 	@Render("Restaurants-item.html")
-	public record Restaurant2(@Flatten Restaurant restaurant, @Render("image.html") Asset image,
-			Category category, Place place) {
+	public record Restaurant2(@Flatten Restaurant restaurant, @Render("image.html") Asset image, Category category,
+			Place place) {
 	}
 
 	public record Page(int number, String text) {
