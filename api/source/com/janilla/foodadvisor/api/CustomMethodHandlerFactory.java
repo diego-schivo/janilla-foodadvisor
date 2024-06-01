@@ -23,19 +23,23 @@
  */
 package com.janilla.foodadvisor.api;
 
+import java.lang.reflect.Type;
 import java.util.Properties;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import com.janilla.http.HttpExchange;
+import com.janilla.json.Converter.MapType;
+import com.janilla.util.EntryList;
 import com.janilla.web.HandleException;
 import com.janilla.web.MethodHandlerFactory;
-import com.janilla.web.MethodInvocation;
 
 public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	public Properties configuration;
 
 	@Override
-	protected void handle(MethodInvocation invocation, HttpExchange exchange) {
+	protected void handle(Invocation invocation, HttpExchange exchange) {
 		if (Boolean.parseBoolean(configuration.getProperty("foodadvisor.live-demo"))) {
 			var q = exchange.getRequest();
 			switch (q.getMethod().name()) {
@@ -55,5 +59,19 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 		else
 			e.requireUser();
 		super.handle(invocation, exchange);
+	}
+
+	@Override
+	protected Object resolveArgument(Type type, HttpExchange exchange, Supplier<String[]> values,
+			EntryList<String, String> entries, Supplier<String> body, Supplier<UnaryOperator<MapType>> resolver) {
+		var q = exchange.getRequest();
+		if (type == Object.class && q.getURI().getPath().startsWith("/api/contents/"))
+			try {
+				type = Class.forName("com.janilla.foodadvisor.api."
+						+ q.getURI().getPath().substring("/api/contents/".length()).split("/")[0].replace('.', '$'));
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+		return super.resolveArgument(type, exchange, values, entries, body, resolver);
 	}
 }

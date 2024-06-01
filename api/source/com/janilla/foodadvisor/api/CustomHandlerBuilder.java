@@ -31,16 +31,14 @@ public class CustomHandlerBuilder extends ApplicationHandlerBuilder {
 
 	@Override
 	protected WebHandlerFactory buildMethodHandlerFactory() {
-		var r = new CustomArgumentsResolver();
-		r.setTypeResolver(x -> {
+		var f = (MethodHandlerFactory) super.buildMethodHandlerFactory();
+		f.setTypeResolver(x -> {
 			try {
 				return Class.forName("com.janilla.foodadvisor.api." + x.replace('.', '$'));
-			} catch (ClassNotFoundException f) {
-				throw new RuntimeException(f);
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
 			}
 		});
-		var f = (MethodHandlerFactory) super.buildMethodHandlerFactory();
-		f.setArgumentsResolver(r);
 		return f;
 	}
 }
