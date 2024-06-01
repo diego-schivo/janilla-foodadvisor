@@ -25,11 +25,12 @@ package com.janilla.foodadvisor.api;
 
 import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.MethodHandlerFactory;
+import com.janilla.web.WebHandlerFactory;
 
 public class CustomHandlerBuilder extends ApplicationHandlerBuilder {
 
 	@Override
-	protected MethodHandlerFactory buildMethodHandlerFactory() {
+	protected WebHandlerFactory buildMethodHandlerFactory() {
 		var r = new CustomArgumentsResolver();
 		r.setTypeResolver(x -> {
 			try {
@@ -38,7 +39,7 @@ public class CustomHandlerBuilder extends ApplicationHandlerBuilder {
 				throw new RuntimeException(f);
 			}
 		});
-		var f = super.buildMethodHandlerFactory();
+		var f = (MethodHandlerFactory) super.buildMethodHandlerFactory();
 		f.setArgumentsResolver(r);
 		return f;
 	}

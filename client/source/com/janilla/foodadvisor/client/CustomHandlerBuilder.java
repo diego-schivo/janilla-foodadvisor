@@ -26,12 +26,13 @@ package com.janilla.foodadvisor.client;
 import com.janilla.web.AnnotationDrivenToMethodInvocation;
 import com.janilla.web.ApplicationHandlerBuilder;
 import com.janilla.web.MethodHandlerFactory;
+import com.janilla.web.WebHandlerFactory;
 
 public class CustomHandlerBuilder extends ApplicationHandlerBuilder {
 
 	@Override
-	protected MethodHandlerFactory buildMethodHandlerFactory() {
-		var f = super.buildMethodHandlerFactory();
+	protected WebHandlerFactory buildMethodHandlerFactory() {
+		var f = (MethodHandlerFactory) super.buildMethodHandlerFactory();
 		((AnnotationDrivenToMethodInvocation) f.getToInvocation()).setComparator((i1, i2) -> {
 			var p1 = i1.object() instanceof PageWeb;
 			var p2 = i2.object() instanceof PageWeb;
