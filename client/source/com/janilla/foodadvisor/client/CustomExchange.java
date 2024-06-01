@@ -32,6 +32,8 @@ import com.janilla.util.Lazy;
 
 public class CustomExchange extends HttpExchange {
 
+	public Layout layout;
+
 	protected Locale locale;
 
 	protected Supplier<Locale> cookieLocale = Lazy.of(() -> {

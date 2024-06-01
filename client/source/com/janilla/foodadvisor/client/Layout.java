@@ -29,10 +29,17 @@ import com.janilla.foodadvisor.api.Global;
 import com.janilla.foodadvisor.api.Link;
 import com.janilla.frontend.RenderEngine;
 import com.janilla.frontend.RenderParticipant;
+import com.janilla.persistence.Persistence;
 import com.janilla.web.Render;
 
 @Render("Layout.html")
 public record Layout(Locale locale, Global global, RenderEngine.Entry entry) implements RenderParticipant {
+
+	public static Layout of(Locale locale, RenderEngine.Entry entry, Persistence persistence) {
+		var ii = persistence.crud(Global.class).list(0, 1).ids();
+		var g = ii.length > 0 ? persistence.crud(Global.class).read(ii[0]) : null;
+		return new Layout(locale, g, entry);
+	}
 
 	public Navbar navbar() {
 		return global != null ? new Navbar(global.navigation()) : null;

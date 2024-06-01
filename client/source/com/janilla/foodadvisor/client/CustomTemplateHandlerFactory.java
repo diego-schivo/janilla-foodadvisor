@@ -23,9 +23,6 @@
  */
 package com.janilla.foodadvisor.client;
 
-import java.util.function.Consumer;
-
-import com.janilla.foodadvisor.api.Global;
 import com.janilla.frontend.RenderEngine;
 import com.janilla.http.HttpExchange;
 import com.janilla.persistence.Persistence;
@@ -40,7 +37,13 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 
 	@Override
 	protected void render(RenderEngine.Entry input, HttpExchange exchange) {
-		applyLayout(input, exchange, x -> super.render(x, exchange));
+		var e = (CustomExchange) exchange;
+		var a = exchange.getRequest().getHeaders().get("Accept");
+		if (e.layout == null && !a.equals("*/*")) {
+			e.layout = Layout.of(e.locale, input, persistence);
+			input = RenderEngine.Entry.of(null, e.layout, null);
+		}
+		super.render(input, exchange);
 	}
 
 	@Override
@@ -48,26 +51,5 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 		var e = (CustomRenderEngine) factory.create(RenderEngine.class);
 		e.locale = ((CustomExchange) exchange).getLocale();
 		return e;
-	}
-
-	static ThreadLocal<Layout> layout = new ThreadLocal<>();
-
-	void applyLayout(RenderEngine.Entry input, HttpExchange exchange, Consumer<RenderEngine.Entry> consumer) {
-		var l = layout.get();
-		var n = l == null;
-		if (n) {
-			var m = ((CustomExchange) exchange).getLocale();
-			var ii = persistence.crud(Global.class).list(0, 1).ids();
-			var g = ii.length > 0 ? persistence.crud(Global.class).read(ii[0]) : null;
-			l = new Layout(m, g, input);
-			layout.set(l);
-			input = RenderEngine.Entry.of(null, l, null);
-		}
-		try {
-			consumer.accept(input);
-		} finally {
-			if (n)
-				layout.remove();
-		}
 	}
 }
