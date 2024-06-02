@@ -32,9 +32,9 @@ public class CustomHandlerBuilder extends ApplicationHandlerBuilder {
 	@Override
 	protected WebHandlerFactory buildMethodHandlerFactory() {
 		var f = (MethodHandlerFactory) super.buildMethodHandlerFactory();
-		f.setComparator((i1, i2) -> {
-			var p1 = i1.object() instanceof PageWeb;
-			var p2 = i2.object() instanceof PageWeb;
+		f.setInvocationComparator((i1, i2) -> {
+			var p1 = i1.target() instanceof PageWeb;
+			var p2 = i2.target() instanceof PageWeb;
 			return Boolean.compare(p1, p2);
 		});
 		return f;
