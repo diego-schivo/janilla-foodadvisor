@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.nio.channels.WritableByteChannel;
 
 import com.janilla.foodadvisor.api.File;
+import com.janilla.http.HttpHeader;
 import com.janilla.http.HttpResponse;
-import com.janilla.http.HttpResponse.Status;
 import com.janilla.io.IO;
 import com.janilla.persistence.Persistence;
 import com.janilla.web.Handle;
@@ -43,17 +43,17 @@ public class FileWeb {
 		var f = persistence.crud(File.class).read(id);
 		if (f == null)
 			throw new NotFoundException();
-		response.setStatus(new Status(200, "OK"));
+		response.setStatus(HttpResponse.Status.of(200));
 		var n = f.name();
 		var e = n.substring(n.lastIndexOf('.') + 1);
 		var hh = response.getHeaders();
 		switch (e) {
 		case "jpg", "png":
-			hh.set("Content-Type", "image/" + e);
+			hh.add(new HttpHeader("Content-Type", "image/" + e));
 			break;
 		}
 		var bb = f.bytes();
-		hh.set("Content-Length", String.valueOf(bb.length));
+		hh.add(new HttpHeader("Content-Length", String.valueOf(bb.length)));
 		var b = (WritableByteChannel) response.getBody();
 		IO.write(bb, b);
 	}

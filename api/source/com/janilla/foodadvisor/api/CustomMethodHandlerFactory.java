@@ -51,7 +51,7 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 		}
 		var e = (CustomExchange) exchange;
 		var q = e.getRequest();
-		var p = q.getURI().getPath();
+		var p = q.getUri().getPath();
 		if (q.getMethod().name().equals("GET") && (p.equals("/admin") || p.equals("/templates.js")))
 			;
 		else if (q.getMethod().name().equals("POST") && p.equals("/admin/login"))
@@ -65,10 +65,10 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 	protected Object resolveArgument(Type type, HttpExchange exchange, Supplier<String[]> values,
 			EntryList<String, String> entries, Supplier<String> body, Supplier<UnaryOperator<MapType>> resolver) {
 		var q = exchange.getRequest();
-		if (type == Object.class && q.getURI().getPath().startsWith("/api/contents/"))
+		if (type == Object.class && q.getUri().getPath().startsWith("/api/contents/"))
 			try {
 				type = Class.forName("com.janilla.foodadvisor.api."
-						+ q.getURI().getPath().substring("/api/contents/".length()).split("/")[0].replace('.', '$'));
+						+ q.getUri().getPath().substring("/api/contents/".length()).split("/")[0].replace('.', '$'));
 			} catch (ClassNotFoundException e) {
 				throw new RuntimeException(e);
 			}

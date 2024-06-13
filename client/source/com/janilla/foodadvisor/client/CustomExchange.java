@@ -28,6 +28,7 @@ import java.util.function.Supplier;
 
 import com.janilla.http.Http;
 import com.janilla.http.HttpExchange;
+import com.janilla.http.HttpHeader;
 import com.janilla.util.Lazy;
 
 public class CustomExchange extends HttpExchange {
@@ -38,7 +39,9 @@ public class CustomExchange extends HttpExchange {
 
 	protected Supplier<Locale> cookieLocale = Lazy.of(() -> {
 		var hh = getRequest().getHeaders();
-		var h = hh != null ? hh.get("Cookie") : null;
+		var h = hh != null
+				? hh.stream().filter(x -> x.name().equals("Cookie")).map(HttpHeader::value).findFirst().orElse(null)
+				: null;
 		var cc = h != null ? Http.parseCookieHeader(h) : null;
 		var s = cc != null ? cc.get("lang") : null;
 		return s != null ? Locale.forLanguageTag(s) : Locale.ENGLISH;
@@ -52,7 +55,7 @@ public class CustomExchange extends HttpExchange {
 		if (this.locale != null)
 			throw new IllegalStateException();
 		this.locale = locale;
-		getResponse().getHeaders().add("Set-Cookie",
-				Http.formatSetCookieHeader("lang", locale.toLanguageTag(), null, "/", "strict"));
+		getResponse().getHeaders().add(new HttpHeader("Set-Cookie",
+				Http.formatSetCookieHeader("lang", locale.toLanguageTag(), null, "/", "strict")));
 	}
 }

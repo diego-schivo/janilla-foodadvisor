@@ -33,7 +33,6 @@ import com.janilla.reflect.Factory;
 import com.janilla.util.Lazy;
 import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerBuilder;
-import com.janilla.web.WebHandler;
 
 public class FoodAdvisorApiApp {
 
@@ -68,7 +67,7 @@ public class FoodAdvisorApiApp {
 		return b.build();
 	});
 
-	private Supplier<WebHandler> handler = Lazy.of(() -> {
+	private Supplier<HttpServer.Handler> handler = Lazy.of(() -> {
 		var b = getFactory().create(ApplicationHandlerBuilder.class);
 		return b.build();
 	});
@@ -85,7 +84,7 @@ public class FoodAdvisorApiApp {
 		return persistence.get();
 	}
 
-	public WebHandler getHandler() {
+	public HttpServer.Handler getHandler() {
 		return handler.get();
 	}
 }
