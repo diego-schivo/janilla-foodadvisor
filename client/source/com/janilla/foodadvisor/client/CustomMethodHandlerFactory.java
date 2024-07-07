@@ -37,7 +37,7 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 	protected void handle(Invocation invocation, HttpExchange exchange) {
 		if (Boolean.parseBoolean(configuration.getProperty("foodadvisor.live-demo"))) {
 			var q = exchange.getRequest();
-			switch (q.getMethod().name()) {
+			switch (q.getMethod()) {
 			case "GET":
 				break;
 			default:

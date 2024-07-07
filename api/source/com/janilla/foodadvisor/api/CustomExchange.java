@@ -28,7 +28,7 @@ import java.util.Properties;
 import java.util.function.Supplier;
 
 import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpHeader;
+import com.janilla.media.HeaderField;
 import com.janilla.json.Jwt;
 import com.janilla.persistence.Persistence;
 import com.janilla.util.Lazy;
@@ -41,7 +41,7 @@ public class CustomExchange extends HttpExchange {
 	public Persistence persistence;
 
 	private Supplier<User> user = Lazy.of(() -> {
-		var a = getRequest().getHeaders().stream().filter(x -> x.name().equals("Authorization")).map(HttpHeader::value)
+		var a = getRequest().getHeaders().stream().filter(x -> x.name().equals("Authorization")).map(HeaderField::value)
 				.findFirst().orElse(null);
 		var t = a != null && a.startsWith("Bearer ") ? a.substring("Bearer ".length()) : null;
 		Map<String, ?> p;

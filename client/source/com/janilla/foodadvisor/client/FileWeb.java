@@ -24,12 +24,10 @@
 package com.janilla.foodadvisor.client;
 
 import java.io.IOException;
-import java.nio.channels.WritableByteChannel;
 
 import com.janilla.foodadvisor.api.File;
-import com.janilla.http.HttpHeader;
 import com.janilla.http.HttpResponse;
-import com.janilla.io.IO;
+import com.janilla.media.HeaderField;
 import com.janilla.persistence.Persistence;
 import com.janilla.web.Handle;
 import com.janilla.web.NotFoundException;
@@ -43,18 +41,20 @@ public class FileWeb {
 		var f = persistence.crud(File.class).read(id);
 		if (f == null)
 			throw new NotFoundException();
-		response.setStatus(HttpResponse.Status.of(200));
+//		response.setStatus(HttpResponse.Status.of(200));
+		response.setStatus(200);
 		var n = f.name();
 		var e = n.substring(n.lastIndexOf('.') + 1);
 		var hh = response.getHeaders();
 		switch (e) {
 		case "jpg", "png":
-			hh.add(new HttpHeader("Content-Type", "image/" + e));
+			hh.add(new HeaderField("Content-Type", "image/" + e));
 			break;
 		}
 		var bb = f.bytes();
-		hh.add(new HttpHeader("Content-Length", String.valueOf(bb.length)));
-		var b = (WritableByteChannel) response.getBody();
-		IO.write(bb, b);
+		hh.add(new HeaderField("Content-Length", String.valueOf(bb.length)));
+//		var b = (WritableByteChannel) response.getBody();
+//		IO.write(bb, b);
+		response.setBody(bb);
 	}
 }

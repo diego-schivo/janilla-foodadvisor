@@ -25,7 +25,7 @@ package com.janilla.foodadvisor.client;
 
 import com.janilla.frontend.RenderEngine;
 import com.janilla.http.HttpExchange;
-import com.janilla.http.HttpHeader;
+import com.janilla.media.HeaderField;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
 import com.janilla.web.TemplateHandlerFactory;
@@ -40,7 +40,7 @@ public class CustomTemplateHandlerFactory extends TemplateHandlerFactory {
 	protected void render(RenderEngine.Entry input, HttpExchange exchange) {
 		var e = (CustomExchange) exchange;
 		var a = exchange.getRequest().getHeaders().stream().filter(x -> x.name().equals("Accept"))
-				.map(HttpHeader::value).findFirst().orElse(null);
+				.map(HeaderField::value).findFirst().orElse(null);
 		if (e.layout == null && !a.equals("*/*")) {
 			e.layout = Layout.of(e.locale, input, persistence);
 			input = RenderEngine.Entry.of(null, e.layout, null);

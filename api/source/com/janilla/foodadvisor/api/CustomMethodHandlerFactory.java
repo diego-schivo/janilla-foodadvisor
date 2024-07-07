@@ -42,7 +42,7 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 	protected void handle(Invocation invocation, HttpExchange exchange) {
 		if (Boolean.parseBoolean(configuration.getProperty("foodadvisor.live-demo"))) {
 			var q = exchange.getRequest();
-			switch (q.getMethod().name()) {
+			switch (q.getMethod()) {
 			case "GET":
 				break;
 			default:
@@ -52,9 +52,9 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 		var e = (CustomExchange) exchange;
 		var q = e.getRequest();
 		var p = q.getUri().getPath();
-		if (q.getMethod().name().equals("GET") && (p.equals("/admin") || p.equals("/templates.js")))
+		if (q.getMethod().equals("GET") && (p.equals("/admin") || p.equals("/templates.js")))
 			;
-		else if (q.getMethod().name().equals("POST") && p.equals("/admin/login"))
+		else if (q.getMethod().equals("POST") && p.equals("/admin/login"))
 			;
 		else
 			e.requireUser();

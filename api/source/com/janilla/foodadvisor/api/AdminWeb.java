@@ -24,8 +24,6 @@
 package com.janilla.foodadvisor.api;
 
 import java.io.IOException;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.Arrays;
 import java.util.HexFormat;
 import java.util.Map;
@@ -76,8 +74,9 @@ public class AdminWeb {
 		{
 			var b = request.getHeaders().stream().filter(x -> x.name().equals("Content-Type"))
 					.map(x -> x.value().split(";")[1].trim().substring("boundary=".length())).findFirst().orElse(null);
-			var c = (ReadableByteChannel) request.getBody();
-			var cc = Channels.newInputStream(c).readAllBytes();
+//			var c = (ReadableByteChannel) request.getBody();
+//			var cc = Channels.newInputStream(c).readAllBytes();
+			var cc = request.getBody();
 			var s = ("--" + b).getBytes();
 			var ii = Util.findIndexes(cc, s);
 			bb = IntStream.range(0, ii.length - 1)
