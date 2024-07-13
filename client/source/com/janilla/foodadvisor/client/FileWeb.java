@@ -48,11 +48,11 @@ public class FileWeb {
 		var hh = response.getHeaders();
 		switch (e) {
 		case "jpg", "png":
-			hh.add(new HeaderField("Content-Type", "image/" + e));
+			hh.add(new HeaderField("content-type", "image/" + e));
 			break;
 		}
 		var bb = f.bytes();
-		hh.add(new HeaderField("Content-Length", String.valueOf(bb.length)));
+		hh.add(new HeaderField("content-length", String.valueOf(bb.length)));
 //		var b = (WritableByteChannel) response.getBody();
 //		IO.write(bb, b);
 		response.setBody(bb);

@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 import com.janilla.http.HttpExchange;
-import com.janilla.json.Converter.MapType;
+import com.janilla.json.Converter;
 import com.janilla.util.EntryList;
 import com.janilla.web.HandleException;
 import com.janilla.web.MethodHandlerFactory;
@@ -63,7 +63,7 @@ public class CustomMethodHandlerFactory extends MethodHandlerFactory {
 
 	@Override
 	protected Object resolveArgument(Type type, HttpExchange exchange, Supplier<String[]> values,
-			EntryList<String, String> entries, Supplier<String> body, Supplier<UnaryOperator<MapType>> resolver) {
+			EntryList<String, String> entries, Supplier<String> body, Supplier<UnaryOperator<Converter.MapType>> resolver) {
 		var q = exchange.getRequest();
 		if (type == Object.class && q.getUri().getPath().startsWith("/api/contents/"))
 			try {

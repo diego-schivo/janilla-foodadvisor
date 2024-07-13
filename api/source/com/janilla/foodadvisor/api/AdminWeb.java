@@ -72,7 +72,7 @@ public class AdminWeb {
 	public long upload(HttpRequest request) throws IOException {
 		byte[] bb;
 		{
-			var b = request.getHeaders().stream().filter(x -> x.name().equals("Content-Type"))
+			var b = request.getHeaders().stream().filter(x -> x.name().equals("content-type"))
 					.map(x -> x.value().split(";")[1].trim().substring("boundary=".length())).findFirst().orElse(null);
 //			var c = (ReadableByteChannel) request.getBody();
 //			var cc = Channels.newInputStream(c).readAllBytes();
