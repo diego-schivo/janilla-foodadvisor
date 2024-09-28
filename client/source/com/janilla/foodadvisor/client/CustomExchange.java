@@ -26,9 +26,9 @@ package com.janilla.foodadvisor.client;
 import java.util.Locale;
 import java.util.function.Supplier;
 
+import com.janilla.http.HeaderField;
 import com.janilla.http.Http;
 import com.janilla.http.HttpExchange;
-import com.janilla.media.HeaderField;
 import com.janilla.util.Lazy;
 
 public class CustomExchange extends HttpExchange {

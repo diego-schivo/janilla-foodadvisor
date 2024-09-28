@@ -26,8 +26,8 @@ package com.janilla.foodadvisor.client;
 import java.io.IOException;
 
 import com.janilla.foodadvisor.api.File;
+import com.janilla.http.HeaderField;
 import com.janilla.http.HttpResponse;
-import com.janilla.media.HeaderField;
 import com.janilla.persistence.Persistence;
 import com.janilla.web.Handle;
 import com.janilla.web.NotFoundException;

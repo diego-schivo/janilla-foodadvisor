@@ -24,8 +24,8 @@
 package com.janilla.foodadvisor.client;
 
 import com.janilla.frontend.RenderEngine;
+import com.janilla.http.HeaderField;
 import com.janilla.http.HttpExchange;
-import com.janilla.media.HeaderField;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
 import com.janilla.web.TemplateHandlerFactory;
