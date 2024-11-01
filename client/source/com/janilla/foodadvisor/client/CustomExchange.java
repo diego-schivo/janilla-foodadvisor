@@ -28,6 +28,7 @@ import java.util.function.Supplier;
 
 import com.janilla.http.HeaderField;
 import com.janilla.http.Http;
+import com.janilla.http.HttpCookie;
 import com.janilla.http.HttpExchange;
 import com.janilla.util.Lazy;
 
@@ -55,7 +56,7 @@ public class CustomExchange extends HttpExchange {
 		if (this.locale != null)
 			throw new IllegalStateException();
 		this.locale = locale;
-		getResponse().getHeaders().add(new HeaderField("Set-Cookie",
-				Http.formatSetCookieHeader("lang", locale.toLanguageTag(), null, "/", "strict")));
+		getResponse().getHeaders().add(new HeaderField("set-cookie",
+				HttpCookie.of("lang", locale.toLanguageTag()).withPath("/").withSameSite("strict").format()));
 	}
 }

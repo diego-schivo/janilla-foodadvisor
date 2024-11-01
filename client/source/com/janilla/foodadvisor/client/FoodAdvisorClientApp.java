@@ -23,75 +23,86 @@
  */
 package com.janilla.foodadvisor.client;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import com.janilla.http.HttpHandler;
+import com.janilla.http.HttpProtocol;
+import com.janilla.net.Net;
 import com.janilla.net.Server;
 import com.janilla.persistence.ApplicationPersistenceBuilder;
 import com.janilla.persistence.Persistence;
 import com.janilla.reflect.Factory;
-import com.janilla.util.Lazy;
 import com.janilla.util.Util;
 import com.janilla.web.ApplicationHandlerBuilder;
 
 public class FoodAdvisorClientApp {
 
-	public static void main(String[] args) throws Exception {
-		var a = new FoodAdvisorClientApp();
-		{
-			var c = new Properties();
-			try (var s = a.getClass().getResourceAsStream("configuration.properties")) {
-				c.load(s);
+	public static void main(String[] args) {
+		try {
+			var pp = new Properties();
+			try (var is = FoodAdvisorClientApp.class.getResourceAsStream("configuration.properties")) {
+				pp.load(is);
+				if (args.length > 0) {
+					var p = args[0];
+					if (p.startsWith("~"))
+						p = System.getProperty("user.home") + p.substring(1);
+					pp.load(Files.newInputStream(Path.of(p)));
+				}
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
 			}
-			a.configuration = c;
+			var a = new FoodAdvisorClientApp(pp);
+			var hp = a.factory.create(HttpProtocol.class);
+			try (var is = Net.class.getResourceAsStream("testkeys")) {
+				hp.setSslContext(Net.getSSLContext("JKS", is, "passphrase".toCharArray()));
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+			hp.setHandler(a.handler);
+			var s = new Server();
+			s.setAddress(new InetSocketAddress(
+					Integer.parseInt(a.configuration.getProperty("foodadvisor.client.server.port"))));
+			s.setProtocol(hp);
+			s.serve();
+		} catch (Throwable e) {
+			e.printStackTrace();
 		}
-		a.getPersistence();
-
-		var s = a.getFactory().create(Server.class);
-		s.setAddress(
-				new InetSocketAddress(Integer.parseInt(a.configuration.getProperty("foodadvisor.client.server.port"))));
-		// s.setHandler(a.getHandler());
-		s.serve();
 	}
 
 	public Properties configuration;
 
-	private Supplier<Factory> factory = Lazy.of(() -> {
-		var f = new Factory();
-		f.setTypes(Stream.concat(Util.getPackageClasses(getClass().getPackageName()),
+	public Factory factory;
+
+	public HttpHandler handler;
+
+	public Persistence persistence;
+
+	public FoodAdvisorClientApp(Properties configuration) {
+		this.configuration = configuration;
+		factory = new Factory();
+		factory.setTypes(Stream.concat(Util.getPackageClasses(getClass().getPackageName()),
 				Util.getPackageClasses("com.janilla.foodadvisor.api")
 						.filter(x -> !x.getSimpleName().equals("CustomMethodHandlerFactory")))
 				.toList());
-		f.setSource(this);
-		return f;
-	});
-
-	private Supplier<Persistence> persistence = Lazy.of(() -> {
-		var b = getFactory().create(ApplicationPersistenceBuilder.class);
-		return b.build();
-	});
-
-	private Supplier<HttpHandler> handler = Lazy.of(() -> {
-		var b = getFactory().create(ApplicationHandlerBuilder.class);
-		return b.build();
-	});
+		factory.setSource(this);
+		handler = factory.create(ApplicationHandlerBuilder.class).build();
+		{
+			var pb = factory.create(ApplicationPersistenceBuilder.class);
+			var p = configuration.getProperty("foodadvisor.database.file");
+			if (p.startsWith("~"))
+				p = System.getProperty("user.home") + p.substring(1);
+			pb.setFile(Path.of(p));
+			persistence = pb.build();
+		}
+	}
 
 	public FoodAdvisorClientApp getApplication() {
 		return this;
-	}
-
-	public Factory getFactory() {
-		return factory.get();
-	}
-
-	public Persistence getPersistence() {
-		return persistence.get();
-	}
-
-	public HttpHandler getHandler() {
-		return handler.get();
 	}
 }

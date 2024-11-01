@@ -207,8 +207,7 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 				} else
 					rr1 = null;
 			}
-			var s = persistence.crud(Restaurant.class)
-					.create(new Restaurant(null, n1, s1, ii1, c1, p1, q1, i1, rr1));
+			var s = persistence.crud(Restaurant.class).create(new Restaurant(null, n1, s1, ii1, c1, p1, q1, i1, rr1));
 
 			for (var j = r.nextInt(1, 2); j > 0; j--) {
 				var t = Randomize.instant(Instant.parse("2020-01-01T00:00:00.00Z"), Instant.now());
@@ -221,7 +220,9 @@ public class CustomPersistenceBuilder extends ApplicationPersistenceBuilder {
 	}
 
 	static byte[] getRandomImage(String size, String term) {
-		try (var s = URI.create("https://source.unsplash.com/" + size + "?" + term).toURL().openStream()) {
+//		try (var s = URI.create("https://source.unsplash.com/" + size + "?" + term).toURL().openStream()) {
+		try (var s = URI.create("https://loremflickr.com/" + size.replace('x', '/') + "/" + term).toURL()
+				.openStream()) {
 			return s.readAllBytes();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
